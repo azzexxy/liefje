@@ -53,10 +53,18 @@
 </section>
 
 <!-- ===================== MEMORY LANE TIMELINE ===================== -->
+<!--
+  Each event is one .timeline-item. To add the next event, copy a whole
+  block below (including its closing </div>) and:
+    - alternate the side-left / side-right class from the previous one
+    - swap the photo src (drop new photos into assets/photos/surprise/)
+    - update the 📍 place and 📅 date (European d/m format) in .timeline-date
+    - write the title (<h3>) and memory text (<p>)
+-->
 <section class="section memory-lane-section locked-content" id="memory-lane">
   <p class="memory-lane-flourish">✦ ✦ ✦</p>
   <h2 class="memory-lane-title">Let's take a trip<br />through memory lane</h2>
-  <p class="section-sub">Vervang de voorbeeldfoto's in <code>assets/photos/surprise/</code> door jullie eigen foto's, en pas de tekstjes aan!</p>
+  <p class="section-sub">Elk plekje hieronder is een dagje samen — er komen er nog meer bij!</p>
 
   <div class="timeline">
     <div class="timeline-track"></div>
@@ -65,55 +73,14 @@
     <div class="timeline-item side-left">
       <div class="timeline-photo">
         <figure class="polaroid rot-1">
-          <img src="assets/photos/surprise/photo1.jpg" alt="Een herinnering samen" onerror="this.parentElement.classList.add('img-missing')" />
+          <img src="assets/photos/surprise/zele-1.jpg" alt="Samen met de hond in Zele" onerror="this.parentElement.classList.add('img-missing')" />
         </figure>
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
-        <h3>ons eerste dingetje 💕</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje bij deze foto -->
-        <p>Schrijf hier een klein tekstje over deze herinnering...</p>
-      </div>
-    </div>
-
-    <div class="timeline-item side-right">
-      <div class="timeline-photo">
-        <figure class="polaroid rot-2">
-          <img src="assets/photos/surprise/photo2.jpg" alt="Een herinnering samen" onerror="this.parentElement.classList.add('img-missing')" />
-        </figure>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <h3>dat gekke uitstapje</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje bij deze foto -->
-        <p>Schrijf hier een klein tekstje over deze herinnering...</p>
-      </div>
-    </div>
-
-    <div class="timeline-item side-left">
-      <div class="timeline-photo">
-        <figure class="polaroid rot-3">
-          <img src="assets/photos/surprise/photo3.jpg" alt="Een herinnering samen" onerror="this.parentElement.classList.add('img-missing')" />
-        </figure>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <h3>gewoon een fijne dag</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje bij deze foto -->
-        <p>Schrijf hier een klein tekstje over deze herinnering...</p>
-      </div>
-    </div>
-
-    <div class="timeline-item side-right">
-      <div class="timeline-photo">
-        <figure class="polaroid rot-4">
-          <img src="assets/photos/surprise/photo4.jpg" alt="Een herinnering samen" onerror="this.parentElement.classList.add('img-missing')" />
-        </figure>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <h3>voor altijd bewaren</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje bij deze foto -->
+        <p class="timeline-date">📍 Zele &nbsp;•&nbsp; 📅 05/06</p>
+        <h3>Knuffels met de hond 🐶</h3>
+        <!-- EDIT ME: schrijf hier een klein tekstje over deze dag -->
         <p>Schrijf hier een klein tekstje over deze herinnering...</p>
       </div>
     </div>

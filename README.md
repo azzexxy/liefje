@@ -17,16 +17,16 @@ photo gallery.
    show a cute placeholder.
 4. **The puzzle** — right after the personal note on surprise.html is a
    sliding picture puzzle she has to solve before the sections below unlock.
-   Drop the photo you want her to piece together into
-   `assets/photos/puzzle.jpg`. Until you do, it falls back to a numbered
-   puzzle (still fully playable) so nothing looks broken in the meantime.
-5. **The surprise page** — open `surprise.html` and edit the message marked
-   `<!-- EDIT ME -->`. The "memory lane" section below it is a timeline of
-   4 photo+text rows (alternating left/right, animating in as you scroll) —
-   drop photos into `assets/photos/surprise/` named `photo1.jpg` through
-   `photo4.jpg`, and edit each row's `<h3>` and `<p>` text. To add or remove
-   a memory, copy/delete a whole `.timeline-item` block and alternate
-   `side-left`/`side-right` classes.
+   The image is `assets/photos/puzzle.jpg` (already set). Swap it for a
+   different photo any time — if the file is ever missing, it falls back to
+   a numbered puzzle (still fully playable) so nothing looks broken.
+5. **The surprise page / memory lane** — open `surprise.html` and edit the
+   message marked `<!-- EDIT ME -->`. Below the puzzle is a timeline of real
+   events (place + date + photo + a short memory), one so far (Zele, 05/06).
+   To add the next one, copy a whole `.timeline-item` block (see the HTML
+   comment right above the timeline for the exact steps: alternate
+   `side-left`/`side-right`, drop the photo in `assets/photos/surprise/`,
+   update the `.timeline-date` place/date, and write the title + text).
 6. **The throwback section** — a second timeline further down surprise.html
    for childhood photos with "POV: me when ..." captions. Drop photos into
    `assets/photos/surprise/` named `baby1.jpg` through `baby3.jpg`, and
