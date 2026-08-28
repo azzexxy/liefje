@@ -206,3 +206,122 @@ if (timelines.length) {
     timeline.querySelectorAll(".timeline-item").forEach((item) => itemObserver.observe(item));
   });
 }
+
+// ============ Puzzle gate: solve the picture to unlock the memories below ============
+const puzzleBoard = document.getElementById("puzzleBoard");
+if (puzzleBoard) {
+  const GRID = 3;
+  const BLANK = null;
+  const imageUrl = puzzleBoard.dataset.image;
+  let tiles = [];
+  let solved = false;
+  let imageAvailable = false;
+
+  function neighborsOf(index) {
+    const row = Math.floor(index / GRID);
+    const col = index % GRID;
+    const result = [];
+    if (row > 0) result.push(index - GRID);
+    if (row < GRID - 1) result.push(index + GRID);
+    if (col > 0) result.push(index - 1);
+    if (col < GRID - 1) result.push(index + 1);
+    return result;
+  }
+
+  function shuffledTiles() {
+    const arr = [];
+    for (let i = 0; i < GRID * GRID - 1; i++) arr.push(i);
+    arr.push(BLANK);
+    let blankIndex = arr.length - 1;
+    // walk random valid moves from the solved state so it's always solvable
+    for (let i = 0; i < 300; i++) {
+      const options = neighborsOf(blankIndex);
+      const swapWith = options[Math.floor(Math.random() * options.length)];
+      [arr[blankIndex], arr[swapWith]] = [arr[swapWith], arr[blankIndex]];
+      blankIndex = swapWith;
+    }
+    // a shuffle that lands back on solved isn't a puzzle — nudge it once more
+    const isSolved = arr.every((v, i) => (i === arr.length - 1 ? v === BLANK : v === i));
+    if (isSolved) {
+      const options = neighborsOf(blankIndex);
+      const swapWith = options[0];
+      [arr[blankIndex], arr[swapWith]] = [arr[swapWith], arr[blankIndex]];
+    }
+    return arr;
+  }
+
+  function render() {
+    puzzleBoard.innerHTML = "";
+    tiles.forEach((value, idx) => {
+      const tile = document.createElement("div");
+      tile.className = "puzzle-tile";
+      if (value === BLANK) {
+        tile.classList.add("blank");
+      } else {
+        if (imageAvailable) {
+          tile.style.backgroundImage = `url('${imageUrl}')`;
+          const row = Math.floor(value / GRID);
+          const col = value % GRID;
+          tile.style.backgroundPosition = `${(col / (GRID - 1)) * 100}% ${(row / (GRID - 1)) * 100}%`;
+        } else {
+          tile.style.background = "var(--pink-100)";
+          tile.style.color = "var(--pink-deep)";
+          tile.style.display = "flex";
+          tile.style.alignItems = "center";
+          tile.style.justifyContent = "center";
+          tile.style.fontFamily = "var(--font-display)";
+          tile.style.fontSize = "2rem";
+          tile.textContent = value + 1;
+        }
+        tile.addEventListener("click", () => attemptMove(idx));
+      }
+      puzzleBoard.appendChild(tile);
+    });
+  }
+
+  function attemptMove(idx) {
+    if (solved) return;
+    const blankIndex = tiles.indexOf(BLANK);
+    if (neighborsOf(idx).includes(blankIndex)) {
+      [tiles[idx], tiles[blankIndex]] = [tiles[blankIndex], tiles[idx]];
+      render();
+      checkSolved();
+    }
+  }
+
+  function checkSolved() {
+    const isSolved = tiles.every((v, i) => (i === tiles.length - 1 ? v === BLANK : v === i));
+    if (!isSolved) return;
+    solved = true;
+    puzzleBoard.classList.add("solved");
+    const msg = document.getElementById("puzzleMsg");
+    if (msg) msg.textContent = "Opgelost! 🎉 welkom bij onze herinneringen...";
+    const rect = puzzleBoard.getBoundingClientRect();
+    burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 220);
+
+    document.querySelectorAll(".locked-content").forEach((el) => {
+      el.classList.remove("locked-content");
+      el.classList.add("reveal-fade");
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("shown")));
+    });
+
+    setTimeout(() => {
+      const target = document.querySelector(".memory-lane-section");
+      if (target) target.scrollIntoView({ behavior: "smooth" });
+    }, 900);
+  }
+
+  const probe = new Image();
+  probe.onload = () => {
+    imageAvailable = true;
+    render();
+  };
+  probe.onerror = () => {
+    imageAvailable = false;
+    render();
+  };
+  probe.src = imageUrl;
+
+  tiles = shuffledTiles();
+  render();
+}

@@ -38,8 +38,22 @@
   </div>
 </section>
 
+<!-- canvas confetti burst -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ===================== PUZZLE GATE ===================== -->
+<section class="section puzzle-section" id="puzzle-section">
+  <h2 class="section-title">Los eerst deze puzzel op<span class="heart-dot">♥</span></h2>
+  <p class="section-sub">Schuif de stukjes tot de foto klopt — dan mag je verder naar onze herinneringen!</p>
+  <div class="puzzle-wrap">
+    <!-- EDIT ME: vervang assets/photos/puzzle.jpg door de echte foto -->
+    <div class="puzzle-board" id="puzzleBoard" data-image="assets/photos/puzzle.jpg"></div>
+  </div>
+  <p class="puzzle-msg" id="puzzleMsg"></p>
+</section>
+
 <!-- ===================== MEMORY LANE TIMELINE ===================== -->
-<section class="section memory-lane-section" id="memory-lane">
+<section class="section memory-lane-section locked-content" id="memory-lane">
   <p class="memory-lane-flourish">✦ ✦ ✦</p>
   <h2 class="memory-lane-title">Let's take a trip<br />through memory lane</h2>
   <p class="section-sub">Vervang de voorbeeldfoto's in <code>assets/photos/surprise/</code> door jullie eigen foto's, en pas de tekstjes aan!</p>
@@ -107,7 +121,7 @@
 </section>
 
 <!-- ===================== BABY/CHILDHOOD THROWBACK TIMELINE ===================== -->
-<section class="section memory-lane-section" id="throwback">
+<section class="section memory-lane-section locked-content" id="throwback">
   <p class="memory-lane-flourish">✦ ✦ ✦</p>
   <h2 class="memory-lane-title">Een kleine throwback<br />naar toen ik nog klein was</h2>
   <p class="section-sub">Vervang de voorbeeldfoto's in <code>assets/photos/surprise/</code> door foto's van jezelf als kind, en vul de meme-tekstjes aan!</p>
