@@ -186,30 +186,6 @@ body {
   z-index: 50;
 }
 
-#flash-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 100;
-  background: radial-gradient(circle, var(--pink-200), var(--pink-deep));
-  opacity: 0;
-  transition: opacity 1.1s ease;
-}
-
-#flash-overlay.show {
-  opacity: 1;
-}
-
-.btn-pulse {
-  animation: btnPulse 0.45s ease;
-}
-
-@keyframes btnPulse {
-  0% { transform: scale(1); }
-  45% { transform: scale(1.18); }
-  100% { transform: scale(1); }
-}
-
 .section {
   position: relative;
   z-index: 1;
@@ -237,20 +213,6 @@ body {
   padding: 90px 20px 30px;
 }
 
-.back-link {
-  position: relative;
-  z-index: 2;
-  display: inline-block;
-  margin: 24px 0 0 24px;
-  color: var(--pink-600);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.back-link:hover {
-  text-decoration: underline;
-}
-
 .eyebrow {
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -272,12 +234,6 @@ body {
   font-size: clamp(1.3rem, 4vw, 1.8rem);
   color: var(--pink-500);
   text-shadow: none;
-}
-
-.hero-sub {
-  font-size: 1.15rem;
-  margin-bottom: 30px;
-  color: var(--text-dark);
 }
 
 .btn-primary,
@@ -367,45 +323,7 @@ body {
   color: var(--pink-deep);
 }
 
-/* ============ Reasons grid ============ */
-.reasons-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-.reason-card {
-  background: white;
-  border-radius: 20px;
-  padding: 26px 20px;
-  text-align: center;
-  box-shadow: var(--shadow);
-  transition: transform 0.2s ease;
-}
-
-.reason-card:hover {
-  transform: translateY(-6px);
-}
-
-.reason-emoji {
-  font-size: 2rem;
-  display: block;
-  margin-bottom: 12px;
-}
-
-.reason-card p {
-  margin: 0;
-  font-size: 1rem;
-}
-
 /* ============ Gallery / polaroids ============ */
-.gallery-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 30px;
-  margin-top: 40px;
-}
 
 .polaroid {
   background: white;
@@ -840,89 +758,12 @@ body {
   }
 }
 
-/* ============ Wish / cake section ============ */
-.wish-section {
-  text-align: center;
-}
-
-.cake-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 30px;
-}
-
-.cake {
-  position: relative;
-  width: 160px;
-  height: 140px;
-}
-
-.cake-layer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 160px;
-  height: 70px;
-  background: linear-gradient(180deg, var(--pink-300), var(--pink-400));
-  border-radius: 10px;
-}
-
-.cake-layer.layer-2 {
-  bottom: 55px;
-  left: 20px;
-  width: 120px;
-  height: 55px;
-  background: linear-gradient(180deg, var(--pink-200), var(--pink-300));
-}
-
-.cake-top {
-  position: absolute;
-  bottom: 100px;
-  left: 45px;
-  width: 70px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-}
-
-.candle {
-  position: absolute;
-  bottom: 118px;
-  left: 74px;
-  width: 10px;
-  height: 34px;
-  background: repeating-linear-gradient(45deg, var(--pink-deep), var(--pink-deep) 4px, white 4px, white 8px);
-  border-radius: 3px;
-  transition: opacity 0.4s ease;
-}
-
-.flame {
-  position: absolute;
-  top: -18px;
-  left: 1px;
-  width: 8px;
-  height: 16px;
-  background: radial-gradient(circle, #ffe08a, #ff9d3d 70%);
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  animation: flicker 0.5s ease-in-out infinite alternate;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
+/* ============ 21-candle cake ============ */
 @keyframes flicker {
   from { transform: scale(1) rotate(-2deg); }
   to { transform: scale(1.15) rotate(2deg); }
 }
 
-.candle.blown .flame {
-  opacity: 0;
-  transform: scale(0);
-}
-
-.candle.blown {
-  opacity: 0.6;
-}
-
-/* ============ 21-candle cake ============ */
 .cake-reveal-section {
   text-align: center;
 }
