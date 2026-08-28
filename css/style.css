@@ -577,7 +577,8 @@ body {
   min-height: 1.5em;
 }
 
-.locked-content {
+.locked-content,
+.locked-content-final {
   display: none;
 }
 
@@ -919,6 +920,96 @@ body {
 
 .candle.blown {
   opacity: 0.6;
+}
+
+/* ============ 21-candle cake ============ */
+.cake-reveal-section {
+  text-align: center;
+}
+
+.big-cake-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0 30px;
+}
+
+.big-cake {
+  width: min(320px, 88vw);
+}
+
+.candles-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 3px;
+  min-height: 32px;
+  margin-bottom: -4px;
+  padding: 0 6px;
+}
+
+.candle-mini {
+  position: relative;
+  width: 5px;
+  height: 20px;
+  background: repeating-linear-gradient(45deg, var(--pink-deep), var(--pink-deep) 2px, white 2px, white 4px);
+  border-radius: 2px;
+  transition: opacity 0.4s ease;
+}
+
+.candle-mini .flame-mini {
+  position: absolute;
+  top: -12px;
+  left: -1.5px;
+  width: 6px;
+  height: 11px;
+  background: radial-gradient(circle, #ffe08a, #ff9d3d 70%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: flicker 0.5s ease-in-out infinite alternate;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.candle-mini.blown .flame-mini {
+  opacity: 0;
+  transform: scale(0);
+}
+
+.candle-mini.blown {
+  opacity: 0.55;
+}
+
+.big-cake-body {
+  position: relative;
+  height: 110px;
+}
+
+.big-cake-layer {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(180deg, var(--pink-300), var(--pink-400));
+  border-radius: 10px;
+}
+
+.big-cake-layer.layer-2 {
+  bottom: 48px;
+  width: 74%;
+  height: 48px;
+  background: linear-gradient(180deg, var(--pink-200), var(--pink-300));
+}
+
+.big-cake-top {
+  position: absolute;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56%;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
 }
 
 .wish-msg {

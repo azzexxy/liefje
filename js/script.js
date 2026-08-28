@@ -376,7 +376,7 @@ if (puzzleBoard) {
     solved = true;
     puzzleBoard.classList.add("solved");
     const msg = document.getElementById("puzzleMsg");
-    if (msg) msg.textContent = "Opgelost! 🎉 welkom bij onze herinneringen...";
+    if (msg) msg.textContent = "Opgelost! 🎉";
     const rect = puzzleBoard.getBoundingClientRect();
     burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 220);
 
@@ -387,7 +387,7 @@ if (puzzleBoard) {
     });
 
     setTimeout(() => {
-      const target = document.querySelector(".memory-lane-section");
+      const target = document.getElementById("cakeReveal");
       if (target) target.scrollIntoView({ behavior: "smooth" });
     }, 900);
   }
@@ -405,4 +405,47 @@ if (puzzleBoard) {
 
   tiles = shuffledTiles();
   render();
+}
+
+// ============ 21 candles: the final wish before the memories unlock ============
+const candlesRow = document.getElementById("candlesRow");
+const blowBigBtn = document.getElementById("blowBigBtn");
+if (candlesRow && blowBigBtn) {
+  const CANDLE_COUNT = 21;
+  for (let i = 0; i < CANDLE_COUNT; i++) {
+    const candle = document.createElement("div");
+    candle.className = "candle-mini";
+    const flame = document.createElement("div");
+    flame.className = "flame-mini";
+    candle.appendChild(flame);
+    candlesRow.appendChild(candle);
+  }
+
+  let bigCakeBlown = false;
+  blowBigBtn.addEventListener("click", () => {
+    if (bigCakeBlown) return;
+    bigCakeBlown = true;
+    blowBigBtn.disabled = true;
+
+    const candles = Array.from(candlesRow.querySelectorAll(".candle-mini"));
+    candles.forEach((candle, i) => {
+      setTimeout(() => candle.classList.add("blown"), i * 60);
+    });
+
+    const rect = candlesRow.getBoundingClientRect();
+    burstConfetti(rect.left + rect.width / 2, rect.top, 260);
+
+    const bigCakeMsg = document.getElementById("bigCakeMsg");
+    if (bigCakeMsg) bigCakeMsg.textContent = "21 wensjes gedaan! welkom bij onze herinneringen... 💗";
+
+    setTimeout(() => {
+      document.querySelectorAll(".locked-content-final").forEach((el) => {
+        el.classList.remove("locked-content-final");
+        el.classList.add("reveal-fade");
+        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("shown")));
+      });
+      const target = document.querySelector(".memory-lane-section");
+      if (target) target.scrollIntoView({ behavior: "smooth" });
+    }, candles.length * 60 + 900);
+  });
 }
