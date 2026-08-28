@@ -1,14 +1,45 @@
-// ============ Security question gate ============
+// ============ Security PIN gate ============
 const gateOverlay = document.getElementById("gate-overlay");
 if (gateOverlay) {
   const GATE_KEY = "liefje_unlocked";
-  // EDIT ME: zet hier het juiste antwoord (niet hoofdlettergevoelig)
-  const CORRECT_ANSWER = "verander-dit-antwoord";
+  const CORRECT_PIN = "0605";
 
   const gateForm = document.getElementById("gateForm");
-  const gateAnswer = document.getElementById("gateAnswer");
   const gateError = document.getElementById("gateError");
   const gateCard = gateOverlay.querySelector(".gate-card");
+  const digits = Array.from(gateOverlay.querySelectorAll(".gate-pin-digit"));
+
+  function currentPin() {
+    return digits.map((d) => d.value).join("");
+  }
+
+  function clearPin() {
+    digits.forEach((d) => {
+      d.value = "";
+      d.classList.remove("filled");
+    });
+    digits[0].focus();
+  }
+
+  function unlockGate() {
+    gateOverlay.classList.add("unlocked");
+    document.body.style.overflow = "";
+    try {
+      localStorage.setItem(GATE_KEY, "1");
+    } catch (e) {}
+  }
+
+  function checkPin() {
+    if (currentPin() === CORRECT_PIN) {
+      unlockGate();
+    } else {
+      gateError.textContent = "niet helemaal... probeer nog eens 💭";
+      gateCard.classList.remove("shake");
+      void gateCard.offsetWidth;
+      gateCard.classList.add("shake");
+      clearPin();
+    }
+  }
 
   let alreadyUnlocked = false;
   try {
@@ -19,23 +50,44 @@ if (gateOverlay) {
     gateOverlay.classList.add("unlocked");
   } else {
     document.body.style.overflow = "hidden";
+
+    digits.forEach((digit, i) => {
+      digit.addEventListener("input", () => {
+        digit.value = digit.value.replace(/[^0-9]/g, "").slice(-1);
+        digit.classList.toggle("filled", digit.value !== "");
+        if (digit.value && i < digits.length - 1) {
+          digits[i + 1].focus();
+        }
+        if (currentPin().length === digits.length) {
+          checkPin();
+        }
+      });
+
+      digit.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !digit.value && i > 0) {
+          digits[i - 1].focus();
+        }
+      });
+
+      digit.addEventListener("paste", (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData.getData("text") || "").replace(/[^0-9]/g, "");
+        pasted
+          .slice(0, digits.length)
+          .split("")
+          .forEach((char, j) => {
+            digits[j].value = char;
+            digits[j].classList.add("filled");
+          });
+        const next = Math.min(pasted.length, digits.length - 1);
+        digits[next].focus();
+        if (currentPin().length === digits.length) checkPin();
+      });
+    });
+
     gateForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const given = gateAnswer.value.trim().toLowerCase();
-      if (given && given === CORRECT_ANSWER.trim().toLowerCase()) {
-        gateOverlay.classList.add("unlocked");
-        document.body.style.overflow = "";
-        try {
-          localStorage.setItem(GATE_KEY, "1");
-        } catch (e) {}
-      } else {
-        gateError.textContent = "niet helemaal... probeer nog eens 💭";
-        gateCard.classList.remove("shake");
-        void gateCard.offsetWidth;
-        gateCard.classList.add("shake");
-        gateAnswer.value = "";
-        gateAnswer.focus();
-      }
+      checkPin();
     });
   }
 }

@@ -108,21 +108,37 @@ body {
   gap: 14px;
 }
 
-.gate-input {
+.gate-pin {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 4px 0 6px;
+}
+
+.gate-pin-digit {
+  width: 52px;
+  height: 62px;
   font-family: var(--font-body);
-  font-size: 1rem;
-  padding: 14px 20px;
-  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.6rem;
+  border-radius: 16px;
   border: 2px solid var(--pink-200);
   outline: none;
   text-align: center;
-  color: var(--text-dark);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  color: var(--pink-deep);
+  background: var(--pink-50);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
 
-.gate-input:focus {
+.gate-pin-digit:focus {
   border-color: var(--pink-400);
   box-shadow: 0 0 0 4px var(--pink-100);
+  transform: scale(1.06);
+}
+
+.gate-pin-digit.filled {
+  border-color: var(--pink-300);
+  background: white;
 }
 
 .gate-error {

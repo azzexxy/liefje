@@ -7,14 +7,12 @@ photo gallery.
 
 ## Personalize it
 
-1. **The security question (do this first!)** — `index.html` opens behind a
-   lock screen only she should be able to pass. Open `index.html`, find
-   `<!-- EDIT ME -->` near the top, and replace the placeholder question
-   `..., next question.` with a real question only she'd know the answer
-   to. Then open `js/script.js`, find `CORRECT_ANSWER` near the top (also
-   marked `<!-- EDIT ME -->`/`EDIT ME`), and set it to the real answer
-   (matching is case-insensitive). Once someone answers correctly, their
-   browser remembers it (via `localStorage`) so they won't be asked again.
+1. **The PIN lock** — `index.html` opens behind a 4-digit PIN pad only she
+   should know (currently set to `0605`). To change it, open `js/script.js`
+   and edit `CORRECT_PIN` near the top. Typing the 4th digit auto-checks it
+   — wrong shakes and clears the boxes, right fades the lock away. Once
+   someone gets it right, their browser remembers it (via `localStorage`)
+   so they won't be asked again.
 2. **Her name & message** — open `index.html` and edit the sections marked
    `<!-- EDIT ME -->` (the hero title and the love note).
 3. **Reasons you love her** — edit the cards in the "Een paar redenen waarom
