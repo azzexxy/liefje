@@ -552,6 +552,21 @@ body {
   justify-content: flex-start;
 }
 
+.timeline-photo-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  max-width: 100%;
+}
+
+.timeline-item.side-left .timeline-photo-group {
+  justify-content: flex-end;
+}
+
+.timeline-item.side-right .timeline-photo-group {
+  justify-content: flex-start;
+}
+
 .timeline-node {
   position: relative;
   z-index: 2;

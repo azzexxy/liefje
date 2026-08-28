@@ -22,11 +22,15 @@ photo gallery.
    a numbered puzzle (still fully playable) so nothing looks broken.
 5. **The surprise page / memory lane** — open `surprise.html` and edit the
    message marked `<!-- EDIT ME -->`. Below the puzzle is a timeline of real
-   events (place + date + photo + a short memory), one so far (Zele, 05/06).
-   To add the next one, copy a whole `.timeline-item` block (see the HTML
-   comment right above the timeline for the exact steps: alternate
-   `side-left`/`side-right`, drop the photo in `assets/photos/surprise/`,
-   update the `.timeline-date` place/date, and write the title + text).
+   events in chronological order (place + date + photo(s) + a short memory):
+   Daknam (22/05), Zele (05/06), Gent (28/06), Knokke (03/07). An event with
+   more than one photo (Gent, Knokke) wraps its `<figure>`s in a
+   `.timeline-photo-group` so they stack together on one side. To add the
+   next one, copy a whole `.timeline-item` block (see the HTML comment right
+   above the timeline for the exact steps: alternate `side-left`/
+   `side-right`, drop the photo(s) in `assets/photos/surprise/`, update the
+   `.timeline-date` place/date, and write the title + text). Mundaka, Spain
+   is next in line but still needs a date and photo(s) before it can be added.
 6. **The throwback section** — a second timeline further down surprise.html
    for childhood photos with "POV: me when ..." captions. Drop photos into
    `assets/photos/surprise/` named `baby1.jpg` through `baby3.jpg`, and
