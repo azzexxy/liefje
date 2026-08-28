@@ -23,18 +23,22 @@ photo gallery.
 5. **The surprise page / memory lane** — open `surprise.html` and edit the
    message marked `<!-- EDIT ME -->`. Below the puzzle is a timeline of real
    events in chronological order (place + date + photo(s) + a short memory):
-   Daknam (22/05), Zele (05/06), Gent (28/06), Knokke (03/07). An event with
-   more than one photo (Gent, Knokke) wraps its `<figure>`s in a
-   `.timeline-photo-group` so they stack together on one side. To add the
-   next one, copy a whole `.timeline-item` block (see the HTML comment right
-   above the timeline for the exact steps: alternate `side-left`/
-   `side-right`, drop the photo(s) in `assets/photos/surprise/`, update the
-   `.timeline-date` place/date, and write the title + text). Mundaka, Spain
-   is next in line but still needs a date and photo(s) before it can be added.
+   Daknam (22/05), Zele (05/06), Gent (28/06), Knokke (03/07), Mundaka
+   (13/07), Sopela Beach (14/07), Guggenheim Bilbao (17/07), Biarritz & La
+   Rochelle (18/07), and Monet's Garden in Giverny (20/07). Every memory
+   text is still a placeholder — search `surprise.html` for
+   `<!-- EDIT ME -->` and write the real ones in. An event with more than
+   one photo wraps its `<figure>`s in a `.timeline-photo-group` so they
+   stack together on one side. To add a new event, copy a whole
+   `.timeline-item` block (see the HTML comment right above the timeline for
+   the exact steps: alternate `side-left`/`side-right`, drop the photo(s) in
+   `assets/photos/surprise/`, update the `.timeline-date` place/date, and
+   write the title + text).
 6. **The throwback section** — a second timeline further down surprise.html
-   for childhood photos with "POV: me when ..." captions. Drop photos into
-   `assets/photos/surprise/` named `baby1.jpg` through `baby3.jpg`, and
-   finish each meme's punchline in the `<p>` marked `<!-- EDIT ME -->`.
+   for childhood photos with "POV: me when ..." captions, already filled in
+   with 3 real photos (`assets/photos/surprise/baby1.jpg` through
+   `baby3.jpg`). Finish each meme's punchline in the `<p>` marked
+   `<!-- EDIT ME -->`.
 
 ## Publish it with GitHub Pages
 
