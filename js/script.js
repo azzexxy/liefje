@@ -21,19 +21,22 @@ for (let i = 0; i < 10; i++) setTimeout(spawnFloatingHeart, i * 200);
 
 // ============ Confetti burst ============
 const canvas = document.getElementById("confetti-canvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas ? canvas.getContext("2d") : null;
 let confettiPieces = [];
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+if (canvas) {
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
+}
 
 const CONFETTI_COLORS = ["#ff9dc5", "#ffd1e3", "#f783ac", "#d6336c", "#fff5f8", "#ffe08a"];
 
 function burstConfetti(originX, originY, count = 120) {
+  if (!canvas) return;
   for (let i = 0; i < count; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 3 + Math.random() * 7;
@@ -101,35 +104,72 @@ function animateConfetti() {
   }
 }
 
-document.getElementById("surpriseBtn").addEventListener("click", (e) => {
-  const rect = e.target.getBoundingClientRect();
-  burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 160);
-});
+// ============ Surprise button: builds up over a few clicks, then leads onward ============
+const surpriseBtn = document.getElementById("surpriseBtn");
+if (surpriseBtn) {
+  const stages = [
+    { label: "Klik nog eens 🎈", burst: 150 },
+    { label: "Nog eentje, beloofd 🥹", burst: 220 },
+    { label: "Oké, echt de laatste... 💖", burst: 300 },
+  ];
+  let stageIndex = 0;
+
+  surpriseBtn.addEventListener("click", () => {
+    const rect = surpriseBtn.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    if (stageIndex < stages.length) {
+      const stage = stages[stageIndex];
+      burstConfetti(cx, cy, stage.burst);
+      surpriseBtn.textContent = stage.label;
+      surpriseBtn.classList.remove("btn-pulse");
+      void surpriseBtn.offsetWidth; // restart the animation
+      surpriseBtn.classList.add("btn-pulse");
+      stageIndex++;
+      return;
+    }
+
+    // final click: one big finale, then head to the surprise page
+    surpriseBtn.disabled = true;
+    burstConfetti(cx, cy, 260);
+    burstConfetti(window.innerWidth / 2, window.innerHeight * 0.3, 260);
+    burstConfetti(window.innerWidth / 2, window.innerHeight * 0.7, 260);
+    const flash = document.getElementById("flash-overlay");
+    if (flash) flash.classList.add("show");
+    setTimeout(() => {
+      window.location.href = "surprise.html";
+    }, 1300);
+  });
+}
 
 // ============ Blow out the candle ============
 const blowBtn = document.getElementById("blowBtn");
-const candle = document.getElementById("cake").querySelector(".candle");
-const wishMsg = document.getElementById("wishMsg");
-const wishes = [
-  "Je wens komt al uit 💫",
-  "Het universum heeft 'm net gehoord 🌙",
-  "Op alles waar je op hoopt 🎀",
-  "Met liefde gemaakt, met sterrenstof toegekend ✨",
-];
+const cakeEl = document.getElementById("cake");
+if (blowBtn && cakeEl) {
+  const candle = cakeEl.querySelector(".candle");
+  const wishMsg = document.getElementById("wishMsg");
+  const wishes = [
+    "Je wens komt al uit 💫",
+    "Het universum heeft 'm net gehoord 🌙",
+    "Op alles waar je op hoopt 🎀",
+    "Met liefde gemaakt, met sterrenstof toegekend ✨",
+  ];
 
-let blown = false;
-blowBtn.addEventListener("click", () => {
-  if (!blown) {
-    blown = true;
-    candle.classList.add("blown");
-    wishMsg.textContent = wishes[Math.floor(Math.random() * wishes.length)];
-    blowBtn.textContent = "Nog een wens doen? 🔁";
-    const rect = candle.getBoundingClientRect();
-    burstConfetti(rect.left + rect.width / 2, rect.top, 100);
-  } else {
-    blown = false;
-    candle.classList.remove("blown");
-    wishMsg.textContent = "";
-    blowBtn.textContent = "Blaas het kaarsje uit 🕯️";
-  }
-});
+  let blown = false;
+  blowBtn.addEventListener("click", () => {
+    if (!blown) {
+      blown = true;
+      candle.classList.add("blown");
+      wishMsg.textContent = wishes[Math.floor(Math.random() * wishes.length)];
+      blowBtn.textContent = "Nog een wens doen? 🔁";
+      const rect = candle.getBoundingClientRect();
+      burstConfetti(rect.left + rect.width / 2, rect.top, 100);
+    } else {
+      blown = false;
+      candle.classList.remove("blown");
+      wishMsg.textContent = "";
+      blowBtn.textContent = "Blaas het kaarsje uit 🕯️";
+    }
+  });
+}
