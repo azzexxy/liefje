@@ -174,23 +174,20 @@ if (blowBtn && cakeEl) {
   });
 }
 
-// ============ Memory lane timeline: springs to life as you scroll to it ============
-const timeline = document.getElementById("timeline");
-if (timeline) {
-  const items = timeline.querySelectorAll(".timeline-item");
-
+// ============ Timelines: each spring to life as you scroll to it (there can be more than one) ============
+const timelines = document.querySelectorAll(".timeline");
+if (timelines.length) {
   const timelineObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          timeline.classList.add("in-view");
+          entry.target.classList.add("in-view");
           timelineObserver.unobserve(entry.target);
         }
       });
     },
     { threshold: 0.1 }
   );
-  timelineObserver.observe(timeline);
 
   const itemObserver = new IntersectionObserver(
     (entries) => {
@@ -203,5 +200,9 @@ if (timeline) {
     },
     { threshold: 0.25 }
   );
-  items.forEach((item) => itemObserver.observe(item));
+
+  timelines.forEach((timeline) => {
+    timelineObserver.observe(timeline);
+    timeline.querySelectorAll(".timeline-item").forEach((item) => itemObserver.observe(item));
+  });
 }

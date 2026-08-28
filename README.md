@@ -22,6 +22,10 @@ photo gallery.
    `photo4.jpg`, and edit each row's `<h3>` and `<p>` text. To add or remove
    a memory, copy/delete a whole `.timeline-item` block and alternate
    `side-left`/`side-right` classes.
+5. **The throwback section** — a second timeline further down surprise.html
+   for childhood photos with "POV: me when ..." captions. Drop photos into
+   `assets/photos/surprise/` named `baby1.jpg` through `baby3.jpg`, and
+   finish each meme's punchline in the `<p>` marked `<!-- EDIT ME -->`.
 
 ## Publish it with GitHub Pages
 
