@@ -111,10 +111,10 @@ const blowBtn = document.getElementById("blowBtn");
 const candle = document.getElementById("cake").querySelector(".candle");
 const wishMsg = document.getElementById("wishMsg");
 const wishes = [
-  "Your wish is already coming true 💫",
-  "The universe just heard that one 🌙",
-  "Here's to everything you're hoping for 🎀",
-  "Made with love, granted with sparkles ✨",
+  "Je wens komt al uit 💫",
+  "Het universum heeft 'm net gehoord 🌙",
+  "Op alles waar je op hoopt 🎀",
+  "Met liefde gemaakt, met sterrenstof toegekend ✨",
 ];
 
 let blown = false;
@@ -123,13 +123,13 @@ blowBtn.addEventListener("click", () => {
     blown = true;
     candle.classList.add("blown");
     wishMsg.textContent = wishes[Math.floor(Math.random() * wishes.length)];
-    blowBtn.textContent = "Make another wish? 🔁";
+    blowBtn.textContent = "Nog een wens doen? 🔁";
     const rect = candle.getBoundingClientRect();
     burstConfetti(rect.left + rect.width / 2, rect.top, 100);
   } else {
     blown = false;
     candle.classList.remove("blown");
     wishMsg.textContent = "";
-    blowBtn.textContent = "Blow out the candle 🕯️";
+    blowBtn.textContent = "Blaas het kaarsje uit 🕯️";
   }
 });
