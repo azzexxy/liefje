@@ -12,6 +12,21 @@
 </head>
 <body>
 
+<!-- ===================== SECURITY QUESTION GATE ===================== -->
+<!-- EDIT ME: vul hier de echte vraag in, en het juiste antwoord in js/script.js -->
+<div id="gate-overlay" class="gate-overlay">
+  <div class="gate-card">
+    <div class="gate-lock">🔒</div>
+    <p class="eyebrow">even een veiligheidsvraagje</p>
+    <h2 class="gate-question">..., next question.</h2>
+    <form id="gateForm" class="gate-form" autocomplete="off">
+      <input type="text" id="gateAnswer" class="gate-input" placeholder="jouw antwoord..." autocomplete="off" />
+      <button type="submit" class="btn-primary">Bevestigen 💗</button>
+    </form>
+    <p class="gate-error" id="gateError"></p>
+  </div>
+</div>
+
 <!-- floating hearts live here, injected by JS -->
 <div id="hearts-bg" aria-hidden="true"></div>
 <div id="flash-overlay" aria-hidden="true"></div>
@@ -116,6 +131,15 @@
   <button class="btn-secondary" id="blowBtn">Blaas het kaarsje uit 🕯️</button>
   <p class="wish-msg" id="wishMsg"></p>
 </section>
+
+<!-- EDIT ME: maak hier de meme af -->
+<div class="mini-throwback">
+  <figure class="polaroid mini-polaroid rot-2">
+    <img src="assets/photos/surprise/baby2.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
+  </figure>
+  <p class="mini-throwback-caption">POV: me when ...</p>
+  <p class="mini-throwback-text">tekst hier</p>
+</div>
 
 <!-- ===================== FOOTER ===================== -->
 <footer class="footer">

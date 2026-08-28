@@ -38,6 +38,15 @@
   </div>
 </section>
 
+<!-- EDIT ME: maak hier de meme af -->
+<div class="mini-throwback">
+  <figure class="polaroid mini-polaroid rot-3">
+    <img src="assets/photos/surprise/baby1.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
+  </figure>
+  <p class="mini-throwback-caption">POV: me when ...</p>
+  <p class="mini-throwback-text">tekst hier</p>
+</div>
+
 <!-- canvas confetti burst -->
 <canvas id="confetti-canvas"></canvas>
 
@@ -58,8 +67,9 @@
   block below (including its closing </div>) and:
     - alternate the side-left / side-right class from the previous one
     - swap the photo src (drop new photos into assets/photos/surprise/)
-    - update the 📍 place and 📅 date (European d/m format) in .timeline-date
-    - write the title (<h3>) and memory text (<p>)
+    - update the place (first <span>) and date (<span class="timeline-day">,
+      European d/m format) in .timeline-date
+    - write the title (<h3>) and memory text (<p>) — both are placeholders
 -->
 <section class="section memory-lane-section locked-content" id="memory-lane">
   <p class="memory-lane-flourish">✦ ✦ ✦</p>
@@ -78,9 +88,9 @@
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
-        <p class="timeline-date">📍 Daknam &nbsp;•&nbsp; 📅 22/05</p>
-        <h3>Een avondwandeling 🌇</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje over deze dag -->
+        <p class="timeline-date"><span>📍 Daknam</span><span class="timeline-day">22/05</span></p>
+        <!-- EDIT ME: titel en tekstje voor deze herinnering -->
+        <h3>Titel van deze herinnering</h3>
         <p>Schrijf hier een klein tekstje over deze herinnering...</p>
       </div>
     </div>
@@ -93,9 +103,9 @@
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
-        <p class="timeline-date">📍 Zele &nbsp;•&nbsp; 📅 05/06</p>
-        <h3>Knuffels met de hond 🐶</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje over deze dag -->
+        <p class="timeline-date"><span>📍 Zele</span><span class="timeline-day">05/06</span></p>
+        <!-- EDIT ME: titel en tekstje voor deze herinnering -->
+        <h3>Titel van deze herinnering</h3>
         <p>Schrijf hier een klein tekstje over deze herinnering...</p>
       </div>
     </div>
@@ -113,9 +123,9 @@
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
-        <p class="timeline-date">📍 Gent &nbsp;•&nbsp; 📅 28/06</p>
-        <h3>Openluchtbioscoop & ijsjes 🍦🎬</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje over deze dag -->
+        <p class="timeline-date"><span>📍 Gent</span><span class="timeline-day">28/06</span></p>
+        <!-- EDIT ME: titel en tekstje voor deze herinnering -->
+        <h3>Titel van deze herinnering</h3>
         <p>Schrijf hier een klein tekstje over deze herinnering...</p>
       </div>
     </div>
@@ -133,9 +143,9 @@
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
-        <p class="timeline-date">📍 Knokke &nbsp;•&nbsp; 📅 03/07</p>
-        <h3>Dagje aan zee 🌊</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje over deze dag -->
+        <p class="timeline-date"><span>📍 Knokke</span><span class="timeline-day">03/07</span></p>
+        <!-- EDIT ME: titel en tekstje voor deze herinnering -->
+        <h3>Titel van deze herinnering</h3>
         <p>Schrijf hier een klein tekstje over deze herinnering...</p>
       </div>
     </div>
@@ -153,9 +163,9 @@
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
-        <p class="timeline-date">📍 Mundaka, Spanje &nbsp;•&nbsp; 📅 13/07</p>
-        <h3>Uitzicht over de baai 🌊</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje over deze dag -->
+        <p class="timeline-date"><span>📍 Mundaka, Spanje</span><span class="timeline-day">13/07</span></p>
+        <!-- EDIT ME: titel en tekstje voor deze herinnering -->
+        <h3>Titel van deze herinnering</h3>
         <p>Schrijf hier een klein tekstje over deze herinnering...</p>
       </div>
     </div>
@@ -168,9 +178,9 @@
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
-        <p class="timeline-date">📍 Sopela Beach, Spanje &nbsp;•&nbsp; 📅 14/07</p>
-        <h3>Zonsondergang met de groep 🌅</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje over deze dag -->
+        <p class="timeline-date"><span>📍 Sopela Beach, Spanje</span><span class="timeline-day">14/07</span></p>
+        <!-- EDIT ME: titel en tekstje voor deze herinnering -->
+        <h3>Titel van deze herinnering</h3>
         <p>Schrijf hier een klein tekstje over deze herinnering...</p>
       </div>
     </div>
@@ -194,9 +204,9 @@
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
-        <p class="timeline-date">📍 Guggenheim museum, Bilbao &nbsp;•&nbsp; 📅 17/07</p>
-        <h3>Museumdate 🎨</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje over deze dag -->
+        <p class="timeline-date"><span>📍 Guggenheim museum, Bilbao</span><span class="timeline-day">17/07</span></p>
+        <!-- EDIT ME: titel en tekstje voor deze herinnering -->
+        <h3>Titel van deze herinnering</h3>
         <p>Schrijf hier een klein tekstje over deze herinnering...</p>
       </div>
     </div>
@@ -214,9 +224,9 @@
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
-        <p class="timeline-date">📍 Biarritz & La Rochelle &nbsp;•&nbsp; 📅 18/07</p>
-        <h3>Kusjes met zeezicht 💋</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje over deze dag -->
+        <p class="timeline-date"><span>📍 Biarritz & La Rochelle</span><span class="timeline-day">18/07</span></p>
+        <!-- EDIT ME: titel en tekstje voor deze herinnering -->
+        <h3>Titel van deze herinnering</h3>
         <p>Schrijf hier een klein tekstje over deze herinnering...</p>
       </div>
     </div>
@@ -237,64 +247,10 @@
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
-        <p class="timeline-date">📍 Monet's tuin, Giverny &nbsp;•&nbsp; 📅 20/07</p>
-        <h3>Tussen de waterlelies 🪷</h3>
-        <!-- EDIT ME: schrijf hier een klein tekstje over deze dag -->
+        <p class="timeline-date"><span>📍 Monet's tuin, Giverny</span><span class="timeline-day">20/07</span></p>
+        <!-- EDIT ME: titel en tekstje voor deze herinnering -->
+        <h3>Titel van deze herinnering</h3>
         <p>Schrijf hier een klein tekstje over deze herinnering...</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== BABY/CHILDHOOD THROWBACK TIMELINE ===================== -->
-<section class="section memory-lane-section locked-content" id="throwback">
-  <p class="memory-lane-flourish">✦ ✦ ✦</p>
-  <h2 class="memory-lane-title">Een kleine throwback<br />naar toen ik nog klein was</h2>
-  <p class="section-sub">Vervang de voorbeeldfoto's in <code>assets/photos/surprise/</code> door foto's van jezelf als kind, en vul de meme-tekstjes aan!</p>
-
-  <div class="timeline">
-    <div class="timeline-track"></div>
-    <div class="timeline-fill"><span class="timeline-runner">👶</span></div>
-
-    <div class="timeline-item side-left">
-      <div class="timeline-photo">
-        <figure class="polaroid rot-2">
-          <img src="assets/photos/surprise/baby1.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
-        </figure>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <h3>POV: me when ...</h3>
-        <!-- EDIT ME: maak hier de meme af -->
-        <p><em>Vul hier de rest van de meme aan! 😆</em></p>
-      </div>
-    </div>
-
-    <div class="timeline-item side-right">
-      <div class="timeline-photo">
-        <figure class="polaroid rot-3">
-          <img src="assets/photos/surprise/baby2.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
-        </figure>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <h3>POV: me when ...</h3>
-        <!-- EDIT ME: maak hier de meme af -->
-        <p><em>Vul hier de rest van de meme aan! 😆</em></p>
-      </div>
-    </div>
-
-    <div class="timeline-item side-left">
-      <div class="timeline-photo">
-        <figure class="polaroid rot-1">
-          <img src="assets/photos/surprise/baby3.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
-        </figure>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <h3>POV: me when ...</h3>
-        <!-- EDIT ME: maak hier de meme af -->
-        <p><em>Vul hier de rest van de meme aan! 😆</em></p>
       </div>
     </div>
   </div>
@@ -302,6 +258,14 @@
 
 <!-- ===================== FOOTER ===================== -->
 <footer class="footer">
+  <!-- EDIT ME: maak hier de meme af -->
+  <div class="mini-throwback">
+    <figure class="polaroid mini-polaroid rot-1">
+      <img src="assets/photos/surprise/baby3.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
+    </figure>
+    <p class="mini-throwback-caption">POV: me when ...</p>
+    <p class="mini-throwback-text">tekst hier</p>
+  </div>
   <p>gemaakt met 💗 speciaal voor jou</p>
 </footer>
 

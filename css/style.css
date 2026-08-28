@@ -32,6 +32,106 @@ body {
   position: relative;
 }
 
+/* ============ Security question gate ============ */
+.gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(180deg, var(--pink-100), var(--pink-300));
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.gate-overlay.unlocked {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.gate-card {
+  position: relative;
+  background: white;
+  border-radius: 28px;
+  padding: 46px 36px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 2px dashed var(--pink-200);
+  animation: gateFloat 4s ease-in-out infinite;
+}
+
+@keyframes gateFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.gate-card.shake {
+  animation: gateShake 0.4s ease;
+}
+
+@keyframes gateShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+.gate-lock {
+  font-size: 2.6rem;
+  margin-bottom: 4px;
+  display: inline-block;
+  animation: gateSwing 2.4s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+@keyframes gateSwing {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+
+.gate-question {
+  font-family: var(--font-display);
+  color: var(--pink-deep);
+  font-size: 1.7rem;
+  line-height: 1.35;
+  margin: 8px 0 24px;
+}
+
+.gate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gate-input {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 14px 20px;
+  border-radius: 50px;
+  border: 2px solid var(--pink-200);
+  outline: none;
+  text-align: center;
+  color: var(--text-dark);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gate-input:focus {
+  border-color: var(--pink-400);
+  box-shadow: 0 0 0 4px var(--pink-100);
+}
+
+.gate-error {
+  min-height: 1.4em;
+  color: var(--pink-deep);
+  font-weight: 600;
+  margin: 14px 0 0;
+}
+
 #hearts-bg {
   position: fixed;
   inset: 0;
@@ -371,6 +471,49 @@ body {
   color: var(--pink-deep);
 }
 
+/* ============ Scattered mini throwback photos ============ */
+.mini-throwback {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 200px;
+  margin: 50px auto;
+  text-align: center;
+}
+
+.mini-polaroid {
+  width: 110px;
+  padding: 8px 8px 16px;
+}
+
+.mini-polaroid img {
+  height: 110px;
+}
+
+.mini-polaroid.img-missing::before {
+  height: 110px;
+  font-size: 0.65rem;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+}
+
+.mini-throwback-caption {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--pink-deep);
+  margin: 0;
+}
+
+.mini-throwback-text {
+  font-size: 0.85rem;
+  color: var(--text-dark);
+  margin: 0;
+}
+
 /* ============ Puzzle gate ============ */
 .puzzle-section {
   text-align: center;
@@ -591,17 +734,34 @@ body {
 }
 
 .timeline-date {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-size: 0.8rem;
   color: var(--pink-600);
   background: var(--pink-100);
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 20px;
   margin: 0 0 10px;
+}
+
+.timeline-day {
+  position: relative;
+  padding-left: 10px;
+  color: var(--pink-500);
+}
+
+.timeline-day::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 1px;
+  height: 12px;
+  background: var(--pink-300);
+  transform: translateY(-50%);
 }
 
 .timeline-text h3 {

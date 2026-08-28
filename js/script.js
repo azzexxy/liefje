@@ -1,3 +1,45 @@
+// ============ Security question gate ============
+const gateOverlay = document.getElementById("gate-overlay");
+if (gateOverlay) {
+  const GATE_KEY = "liefje_unlocked";
+  // EDIT ME: zet hier het juiste antwoord (niet hoofdlettergevoelig)
+  const CORRECT_ANSWER = "verander-dit-antwoord";
+
+  const gateForm = document.getElementById("gateForm");
+  const gateAnswer = document.getElementById("gateAnswer");
+  const gateError = document.getElementById("gateError");
+  const gateCard = gateOverlay.querySelector(".gate-card");
+
+  let alreadyUnlocked = false;
+  try {
+    alreadyUnlocked = localStorage.getItem(GATE_KEY) === "1";
+  } catch (e) {}
+
+  if (alreadyUnlocked) {
+    gateOverlay.classList.add("unlocked");
+  } else {
+    document.body.style.overflow = "hidden";
+    gateForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const given = gateAnswer.value.trim().toLowerCase();
+      if (given && given === CORRECT_ANSWER.trim().toLowerCase()) {
+        gateOverlay.classList.add("unlocked");
+        document.body.style.overflow = "";
+        try {
+          localStorage.setItem(GATE_KEY, "1");
+        } catch (e) {}
+      } else {
+        gateError.textContent = "niet helemaal... probeer nog eens 💭";
+        gateCard.classList.remove("shake");
+        void gateCard.offsetWidth;
+        gateCard.classList.add("shake");
+        gateAnswer.value = "";
+        gateAnswer.focus();
+      }
+    });
+  }
+}
+
 // ============ Floating background hearts ============
 const heartsBg = document.getElementById("hearts-bg");
 const HEART_CHARS = ["💗", "💕", "💖", "🌸", "♥"];
