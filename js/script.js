@@ -208,45 +208,27 @@ if (timelines.length) {
 }
 
 // ============ Puzzle gate: solve the picture to unlock the memories below ============
+// Easy mode: click any two tiles to swap them (no sliding, no blank tile) —
+// any shuffle is reachable this way, so it's always solvable.
 const puzzleBoard = document.getElementById("puzzleBoard");
 if (puzzleBoard) {
   const GRID = 3;
-  const BLANK = null;
   const imageUrl = puzzleBoard.dataset.image;
   let tiles = [];
+  let selectedIndex = null;
   let solved = false;
   let imageAvailable = false;
 
-  function neighborsOf(index) {
-    const row = Math.floor(index / GRID);
-    const col = index % GRID;
-    const result = [];
-    if (row > 0) result.push(index - GRID);
-    if (row < GRID - 1) result.push(index + GRID);
-    if (col > 0) result.push(index - 1);
-    if (col < GRID - 1) result.push(index + 1);
-    return result;
-  }
-
   function shuffledTiles() {
     const arr = [];
-    for (let i = 0; i < GRID * GRID - 1; i++) arr.push(i);
-    arr.push(BLANK);
-    let blankIndex = arr.length - 1;
-    // walk random valid moves from the solved state so it's always solvable
-    for (let i = 0; i < 300; i++) {
-      const options = neighborsOf(blankIndex);
-      const swapWith = options[Math.floor(Math.random() * options.length)];
-      [arr[blankIndex], arr[swapWith]] = [arr[swapWith], arr[blankIndex]];
-      blankIndex = swapWith;
-    }
-    // a shuffle that lands back on solved isn't a puzzle — nudge it once more
-    const isSolved = arr.every((v, i) => (i === arr.length - 1 ? v === BLANK : v === i));
-    if (isSolved) {
-      const options = neighborsOf(blankIndex);
-      const swapWith = options[0];
-      [arr[blankIndex], arr[swapWith]] = [arr[swapWith], arr[blankIndex]];
-    }
+    for (let i = 0; i < GRID * GRID; i++) arr.push(i);
+    // Fisher-Yates, then guarantee it isn't already solved
+    do {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    } while (arr.every((v, i) => v === i));
     return arr;
   }
 
@@ -255,42 +237,47 @@ if (puzzleBoard) {
     tiles.forEach((value, idx) => {
       const tile = document.createElement("div");
       tile.className = "puzzle-tile";
-      if (value === BLANK) {
-        tile.classList.add("blank");
+      if (idx === selectedIndex) tile.classList.add("selected");
+      if (imageAvailable) {
+        tile.style.backgroundImage = `url('${imageUrl}')`;
+        const row = Math.floor(value / GRID);
+        const col = value % GRID;
+        tile.style.backgroundPosition = `${(col / (GRID - 1)) * 100}% ${(row / (GRID - 1)) * 100}%`;
       } else {
-        if (imageAvailable) {
-          tile.style.backgroundImage = `url('${imageUrl}')`;
-          const row = Math.floor(value / GRID);
-          const col = value % GRID;
-          tile.style.backgroundPosition = `${(col / (GRID - 1)) * 100}% ${(row / (GRID - 1)) * 100}%`;
-        } else {
-          tile.style.background = "var(--pink-100)";
-          tile.style.color = "var(--pink-deep)";
-          tile.style.display = "flex";
-          tile.style.alignItems = "center";
-          tile.style.justifyContent = "center";
-          tile.style.fontFamily = "var(--font-display)";
-          tile.style.fontSize = "2rem";
-          tile.textContent = value + 1;
-        }
-        tile.addEventListener("click", () => attemptMove(idx));
+        tile.style.background = "var(--pink-100)";
+        tile.style.color = "var(--pink-deep)";
+        tile.style.display = "flex";
+        tile.style.alignItems = "center";
+        tile.style.justifyContent = "center";
+        tile.style.fontFamily = "var(--font-display)";
+        tile.style.fontSize = "2rem";
+        tile.textContent = value + 1;
       }
+      tile.addEventListener("click", () => selectTile(idx));
       puzzleBoard.appendChild(tile);
     });
   }
 
-  function attemptMove(idx) {
+  function selectTile(idx) {
     if (solved) return;
-    const blankIndex = tiles.indexOf(BLANK);
-    if (neighborsOf(idx).includes(blankIndex)) {
-      [tiles[idx], tiles[blankIndex]] = [tiles[blankIndex], tiles[idx]];
+    if (selectedIndex === null) {
+      selectedIndex = idx;
       render();
-      checkSolved();
+      return;
     }
+    if (selectedIndex === idx) {
+      selectedIndex = null;
+      render();
+      return;
+    }
+    [tiles[idx], tiles[selectedIndex]] = [tiles[selectedIndex], tiles[idx]];
+    selectedIndex = null;
+    render();
+    checkSolved();
   }
 
   function checkSolved() {
-    const isSolved = tiles.every((v, i) => (i === tiles.length - 1 ? v === BLANK : v === i));
+    const isSolved = tiles.every((v, i) => v === i);
     if (!isSolved) return;
     solved = true;
     puzzleBoard.classList.add("solved");

@@ -417,8 +417,11 @@ body {
   transform: scale(1.02);
 }
 
-.puzzle-tile.blank {
-  visibility: hidden;
+.puzzle-tile.selected {
+  outline: 3px solid var(--pink-deep);
+  outline-offset: -3px;
+  transform: scale(0.94);
+  filter: brightness(1.1);
 }
 
 .puzzle-msg {

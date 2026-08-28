@@ -16,10 +16,11 @@ photo gallery.
    `index.html` to match your filenames). Until you add photos, those spots
    show a cute placeholder.
 4. **The puzzle** — right after the personal note on surprise.html is a
-   sliding picture puzzle she has to solve before the sections below unlock.
-   The image is `assets/photos/puzzle.jpg` (already set). Swap it for a
-   different photo any time — if the file is ever missing, it falls back to
-   a numbered puzzle (still fully playable) so nothing looks broken.
+   picture puzzle she has to solve before the sections below unlock: click
+   any two tiles to swap them. The image is `assets/photos/puzzle.jpg`
+   (already set). Swap it for a different photo any time — if the file is
+   ever missing, it falls back to a numbered puzzle (still fully playable)
+   so nothing looks broken.
 5. **The surprise page / memory lane** — open `surprise.html` and edit the
    message marked `<!-- EDIT ME -->`. Below the puzzle is a timeline of real
    events in chronological order (place + date + photo(s) + a short memory):
