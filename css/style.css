@@ -1,0 +1,450 @@
+/* ============ Pastel Pink Birthday Theme ============ */
+:root {
+  --pink-50: #fff5f8;
+  --pink-100: #ffe4ee;
+  --pink-200: #ffd1e3;
+  --pink-300: #ffb6d5;
+  --pink-400: #ff9dc5;
+  --pink-500: #f783ac;
+  --pink-600: #e35d99;
+  --pink-deep: #d6336c;
+  --cream: #fffaf9;
+  --text-dark: #6b3a4d;
+  --shadow: 0 10px 30px rgba(214, 51, 108, 0.15);
+  --font-body: "Quicksand", sans-serif;
+  --font-display: "Dancing Script", cursive;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--text-dark);
+  background: linear-gradient(180deg, var(--pink-50), var(--pink-100) 40%, var(--pink-50));
+  overflow-x: hidden;
+  position: relative;
+}
+
+#hearts-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.floating-heart {
+  position: absolute;
+  bottom: -10%;
+  color: var(--pink-400);
+  opacity: 0.55;
+  animation: floatUp linear infinite;
+  user-select: none;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-115vh) translateX(var(--drift, 20px)) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+#confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.section {
+  position: relative;
+  z-index: 1;
+  padding: 70px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ============ Hero ============ */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  background: radial-gradient(circle at 50% 20%, var(--pink-200), transparent 60%);
+}
+
+.eyebrow {
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--pink-600);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 6rem);
+  color: var(--pink-deep);
+  margin: 0 0 10px;
+  text-shadow: 2px 2px 0 var(--pink-100);
+}
+
+.hero-sub {
+  font-size: 1.15rem;
+  margin-bottom: 30px;
+  color: var(--text-dark);
+}
+
+.btn-primary,
+.btn-secondary {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  border-radius: 50px;
+  padding: 16px 34px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--pink-400), var(--pink-deep));
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--pink-deep);
+  border: 2px solid var(--pink-300);
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  transform: translateY(-3px) scale(1.03);
+}
+
+.scroll-cue {
+  position: absolute;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--pink-500);
+  font-size: 0.8rem;
+  animation: bounce 2s infinite;
+}
+
+.scroll-arrow {
+  font-size: 1.3rem;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+/* ============ Section titles ============ */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  text-align: center;
+  color: var(--pink-deep);
+  margin-bottom: 10px;
+}
+
+.section-sub {
+  text-align: center;
+  color: var(--pink-600);
+  margin-top: -6px;
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+}
+
+.heart-dot {
+  color: var(--pink-400);
+  margin-left: 8px;
+}
+
+/* ============ Love note ============ */
+.card {
+  background: white;
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  padding: 45px 40px;
+  position: relative;
+}
+
+.note-card {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  border: 2px dashed var(--pink-200);
+}
+
+.quote-mark {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  color: var(--pink-300);
+  line-height: 0;
+  margin-bottom: 10px;
+}
+
+.note-text {
+  font-size: 1.15rem;
+  line-height: 1.8;
+}
+
+.note-signature {
+  margin-top: 18px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--pink-deep);
+}
+
+/* ============ Reasons grid ============ */
+.reasons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.reason-card {
+  background: white;
+  border-radius: 20px;
+  padding: 26px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease;
+}
+
+.reason-card:hover {
+  transform: translateY(-6px);
+}
+
+.reason-emoji {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.reason-card p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* ============ Gallery / polaroids ============ */
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.polaroid {
+  background: white;
+  padding: 14px 14px 26px;
+  box-shadow: var(--shadow);
+  width: 220px;
+  margin: 0;
+  transition: transform 0.2s ease;
+}
+
+.polaroid:hover {
+  transform: scale(1.05) rotate(0deg) !important;
+}
+
+.rot-1 { transform: rotate(-6deg); }
+.rot-2 { transform: rotate(4deg); }
+.rot-3 { transform: rotate(-3deg); }
+
+.polaroid img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  background: var(--pink-100);
+}
+
+.polaroid.img-missing img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.polaroid.img-missing {
+  position: relative;
+}
+
+.polaroid.img-missing img {
+  visibility: hidden;
+}
+
+.polaroid.img-missing::before {
+  content: "📷 add photo\A assets/photos/";
+  white-space: pre;
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  height: 220px;
+  background: var(--pink-100);
+  color: var(--pink-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.85rem;
+  border-radius: 4px;
+}
+
+.polaroid figcaption {
+  text-align: center;
+  padding-top: 12px;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--pink-deep);
+}
+
+/* ============ Wish / cake section ============ */
+.wish-section {
+  text-align: center;
+}
+
+.cake-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.cake {
+  position: relative;
+  width: 160px;
+  height: 140px;
+}
+
+.cake-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 160px;
+  height: 70px;
+  background: linear-gradient(180deg, var(--pink-300), var(--pink-400));
+  border-radius: 10px;
+}
+
+.cake-layer.layer-2 {
+  bottom: 55px;
+  left: 20px;
+  width: 120px;
+  height: 55px;
+  background: linear-gradient(180deg, var(--pink-200), var(--pink-300));
+}
+
+.cake-top {
+  position: absolute;
+  bottom: 100px;
+  left: 45px;
+  width: 70px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+}
+
+.candle {
+  position: absolute;
+  bottom: 118px;
+  left: 74px;
+  width: 10px;
+  height: 34px;
+  background: repeating-linear-gradient(45deg, var(--pink-deep), var(--pink-deep) 4px, white 4px, white 8px);
+  border-radius: 3px;
+  transition: opacity 0.4s ease;
+}
+
+.flame {
+  position: absolute;
+  top: -18px;
+  left: 1px;
+  width: 8px;
+  height: 16px;
+  background: radial-gradient(circle, #ffe08a, #ff9d3d 70%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: flicker 0.5s ease-in-out infinite alternate;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes flicker {
+  from { transform: scale(1) rotate(-2deg); }
+  to { transform: scale(1.15) rotate(2deg); }
+}
+
+.candle.blown .flame {
+  opacity: 0;
+  transform: scale(0);
+}
+
+.candle.blown {
+  opacity: 0.6;
+}
+
+.wish-msg {
+  margin-top: 20px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--pink-deep);
+  min-height: 1.5em;
+}
+
+/* ============ QR share ============ */
+.qr-section {
+  text-align: center;
+}
+
+.qr-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.qr-wrap img {
+  width: min(320px, 80vw);
+  height: auto;
+  filter: drop-shadow(0 10px 25px rgba(214, 51, 108, 0.25));
+}
+
+/* ============ Footer ============ */
+.footer {
+  text-align: center;
+  padding: 30px;
+  color: var(--pink-500);
+  font-size: 0.9rem;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 30px 22px;
+  }
+}

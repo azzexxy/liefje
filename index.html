@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Happy Birthday, My Love 💕</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><text y=%2226%22 font-size=%2226%22>💗</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- floating hearts live here, injected by JS -->
+<div id="hearts-bg" aria-hidden="true"></div>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <p class="eyebrow">a little something for</p>
+    <!-- EDIT ME: put her name here -->
+    <h1 class="hero-title">My Favorite Person</h1>
+    <p class="hero-sub">It's your birthday! 🎂 Tap the balloon and let's celebrate.</p>
+    <button class="btn-primary" id="surpriseBtn">Tap me for a surprise 🎁</button>
+  </div>
+  <div class="scroll-cue">
+    <span>scroll for more</span>
+    <div class="scroll-arrow">↓</div>
+  </div>
+</section>
+
+<!-- canvas confetti burst -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ===================== LOVE NOTE ===================== -->
+<section class="section note-section">
+  <div class="card note-card">
+    <div class="quote-mark">“</div>
+    <!-- EDIT ME: your personal birthday message -->
+    <p class="note-text">
+      Happy birthday to the person who makes every ordinary day feel like something worth
+      celebrating. I hope today is as sweet, warm and wonderful as you are. Here's to another
+      year of your laugh, your hugs, and all the little moments that make my heart so full.
+      I love you more than words can say. 💗
+    </p>
+    <p class="note-signature">— always yours</p>
+  </div>
+</section>
+
+<!-- ===================== REASONS I LOVE YOU ===================== -->
+<section class="section reasons-section">
+  <h2 class="section-title">A few reasons I love you<span class="heart-dot">♥</span></h2>
+  <div class="reasons-grid">
+    <div class="reason-card">
+      <span class="reason-emoji">😄</span>
+      <p>Your laugh is my favorite sound in the whole world.</p>
+    </div>
+    <div class="reason-card">
+      <span class="reason-emoji">🫶</span>
+      <p>You care so deeply about everyone around you.</p>
+    </div>
+    <div class="reason-card">
+      <span class="reason-emoji">🌷</span>
+      <p>You make even boring days feel like an adventure.</p>
+    </div>
+    <div class="reason-card">
+      <span class="reason-emoji">🍰</span>
+      <p>You're the best partner in crime for late-night snacks.</p>
+    </div>
+    <div class="reason-card">
+      <span class="reason-emoji">🎧</span>
+      <p>Your taste in music is somehow always exactly right.</p>
+    </div>
+    <div class="reason-card">
+      <span class="reason-emoji">💌</span>
+      <p><em>Edit these cards — add your own inside jokes and reasons!</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MEMORIES / GALLERY ===================== -->
+<section class="section gallery-section">
+  <h2 class="section-title">Our little memory book<span class="heart-dot">♥</span></h2>
+  <p class="section-sub">Replace the placeholders in <code>assets/photos/</code> with your own pictures!</p>
+  <div class="gallery-grid">
+    <figure class="polaroid rot-1">
+      <img src="assets/photos/photo1.jpg" alt="A memory together" onerror="this.parentElement.classList.add('img-missing')" />
+      <figcaption>that one perfect day 💕</figcaption>
+    </figure>
+    <figure class="polaroid rot-2">
+      <img src="assets/photos/photo2.jpg" alt="A memory together" onerror="this.parentElement.classList.add('img-missing')" />
+      <figcaption>us, being silly</figcaption>
+    </figure>
+    <figure class="polaroid rot-3">
+      <img src="assets/photos/photo3.jpg" alt="A memory together" onerror="this.parentElement.classList.add('img-missing')" />
+      <figcaption>my favorite smile</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===================== BIRTHDAY WISH BUTTON ===================== -->
+<section class="section wish-section">
+  <h2 class="section-title">Make a wish<span class="heart-dot">♥</span></h2>
+  <div class="cake-wrap">
+    <div class="cake" id="cake">
+      <div class="candle">
+        <div class="flame"></div>
+      </div>
+      <div class="cake-top"></div>
+      <div class="cake-layer"></div>
+      <div class="cake-layer layer-2"></div>
+    </div>
+  </div>
+  <button class="btn-secondary" id="blowBtn">Blow out the candle 🕯️</button>
+  <p class="wish-msg" id="wishMsg"></p>
+</section>
+
+<!-- ===================== SHARE / QR ===================== -->
+<section class="section qr-section">
+  <h2 class="section-title">Share the love<span class="heart-dot">♥</span></h2>
+  <p class="section-sub">Scan to open this page on your phone</p>
+  <div class="qr-wrap">
+    <img src="assets/qr-code.png" alt="QR code shaped like a pastel pink heart, linking to this site" />
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <p>made with 💗 just for you</p>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
