@@ -1,97 +1,3 @@
-// ============ Security PIN gate ============
-const gateOverlay = document.getElementById("gate-overlay");
-if (gateOverlay) {
-  const GATE_KEY = "liefje_unlocked";
-  const CORRECT_PIN = "0605";
-
-  const gateForm = document.getElementById("gateForm");
-  const gateError = document.getElementById("gateError");
-  const gateCard = gateOverlay.querySelector(".gate-card");
-  const digits = Array.from(gateOverlay.querySelectorAll(".gate-pin-digit"));
-
-  function currentPin() {
-    return digits.map((d) => d.value).join("");
-  }
-
-  function clearPin() {
-    digits.forEach((d) => {
-      d.value = "";
-      d.classList.remove("filled");
-    });
-    digits[0].focus();
-  }
-
-  function unlockGate() {
-    gateOverlay.classList.add("unlocked");
-    document.body.style.overflow = "";
-    try {
-      localStorage.setItem(GATE_KEY, "1");
-    } catch (e) {}
-  }
-
-  function checkPin() {
-    if (currentPin() === CORRECT_PIN) {
-      unlockGate();
-    } else {
-      gateError.textContent = "niet helemaal... probeer nog eens 💭";
-      gateCard.classList.remove("shake");
-      void gateCard.offsetWidth;
-      gateCard.classList.add("shake");
-      clearPin();
-    }
-  }
-
-  let alreadyUnlocked = false;
-  try {
-    alreadyUnlocked = localStorage.getItem(GATE_KEY) === "1";
-  } catch (e) {}
-
-  if (alreadyUnlocked) {
-    gateOverlay.classList.add("unlocked");
-  } else {
-    document.body.style.overflow = "hidden";
-
-    digits.forEach((digit, i) => {
-      digit.addEventListener("input", () => {
-        digit.value = digit.value.replace(/[^0-9]/g, "").slice(-1);
-        digit.classList.toggle("filled", digit.value !== "");
-        if (digit.value && i < digits.length - 1) {
-          digits[i + 1].focus();
-        }
-        if (currentPin().length === digits.length) {
-          checkPin();
-        }
-      });
-
-      digit.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && !digit.value && i > 0) {
-          digits[i - 1].focus();
-        }
-      });
-
-      digit.addEventListener("paste", (e) => {
-        e.preventDefault();
-        const pasted = (e.clipboardData.getData("text") || "").replace(/[^0-9]/g, "");
-        pasted
-          .slice(0, digits.length)
-          .split("")
-          .forEach((char, j) => {
-            digits[j].value = char;
-            digits[j].classList.add("filled");
-          });
-        const next = Math.min(pasted.length, digits.length - 1);
-        digits[next].focus();
-        if (currentPin().length === digits.length) checkPin();
-      });
-    });
-
-    gateForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      checkPin();
-    });
-  }
-}
-
 // ============ Floating background hearts ============
 const heartsBg = document.getElementById("hearts-bg");
 const HEART_CHARS = ["💗", "💕", "💖", "🌸", "♥"];
@@ -351,21 +257,39 @@ if (candlesRow && blowBigBtn) {
     candlesRow.appendChild(candle);
   }
 
+  // takes a few puffs to get all 21 out — the button text escalates each time
+  const BLOW_MESSAGES = ["Blaas nog eens", "Blaas harder", "Bijna..."];
+  const TOTAL_BLOWS = BLOW_MESSAGES.length + 1;
+  const bigCakeMsg = document.getElementById("bigCakeMsg");
   let bigCakeBlown = false;
+  let blowCount = 0;
+
   blowBigBtn.addEventListener("click", () => {
     if (bigCakeBlown) return;
-    bigCakeBlown = true;
-    blowBigBtn.disabled = true;
+    blowCount++;
+    const isFinal = blowCount >= TOTAL_BLOWS;
 
-    const candles = Array.from(candlesRow.querySelectorAll(".candle-mini"));
-    candles.forEach((candle, i) => {
+    const remaining = Array.from(candlesRow.querySelectorAll(".candle-mini:not(.blown)"));
+    const perBlow = Math.ceil(21 / TOTAL_BLOWS);
+    const toBlow = isFinal ? remaining : remaining.slice(0, perBlow);
+    toBlow.forEach((candle, i) => {
       setTimeout(() => candle.classList.add("blown"), i * 60);
     });
 
     const rect = candlesRow.getBoundingClientRect();
-    burstConfetti(rect.left + rect.width / 2, rect.top, 260);
+    burstConfetti(rect.left + rect.width / 2, rect.top, isFinal ? 260 : 90);
 
-    const bigCakeMsg = document.getElementById("bigCakeMsg");
+    blowBigBtn.classList.remove("btn-pulse");
+    void blowBigBtn.offsetWidth;
+    blowBigBtn.classList.add("btn-pulse");
+
+    if (!isFinal) {
+      blowBigBtn.textContent = BLOW_MESSAGES[blowCount - 1];
+      return;
+    }
+
+    bigCakeBlown = true;
+    blowBigBtn.disabled = true;
     if (bigCakeMsg) bigCakeMsg.textContent = "21 wensjes gedaan! welkom bij onze herinneringen... 💗";
 
     setTimeout(() => {
@@ -376,6 +300,6 @@ if (candlesRow && blowBigBtn) {
       });
       const target = document.querySelector(".memory-lane-section");
       if (target) target.scrollIntoView({ behavior: "smooth" });
-    }, candles.length * 60 + 900);
+    }, toBlow.length * 60 + 900);
   });
 }

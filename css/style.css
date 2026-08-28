@@ -32,122 +32,6 @@ body {
   position: relative;
 }
 
-/* ============ Security question gate ============ */
-.gate-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: linear-gradient(180deg, var(--pink-100), var(--pink-300));
-  transition: opacity 0.6s ease, visibility 0.6s ease;
-}
-
-.gate-overlay.unlocked {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.gate-card {
-  position: relative;
-  background: white;
-  border-radius: 28px;
-  padding: 46px 36px;
-  max-width: 420px;
-  width: 100%;
-  text-align: center;
-  box-shadow: var(--shadow);
-  border: 2px dashed var(--pink-200);
-  animation: gateFloat 4s ease-in-out infinite;
-}
-
-@keyframes gateFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.gate-card.shake {
-  animation: gateShake 0.4s ease;
-}
-
-@keyframes gateShake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-10px); }
-  40% { transform: translateX(10px); }
-  60% { transform: translateX(-6px); }
-  80% { transform: translateX(6px); }
-}
-
-.gate-lock {
-  font-size: 2.6rem;
-  margin-bottom: 4px;
-  display: inline-block;
-  animation: gateSwing 2.4s ease-in-out infinite;
-  transform-origin: top center;
-}
-
-@keyframes gateSwing {
-  0%, 100% { transform: rotate(-8deg); }
-  50% { transform: rotate(8deg); }
-}
-
-.gate-question {
-  font-family: var(--font-display);
-  color: var(--pink-deep);
-  font-size: 1.7rem;
-  line-height: 1.35;
-  margin: 8px 0 24px;
-}
-
-.gate-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.gate-pin {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 4px 0 6px;
-}
-
-.gate-pin-digit {
-  width: 52px;
-  height: 62px;
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 1.6rem;
-  border-radius: 16px;
-  border: 2px solid var(--pink-200);
-  outline: none;
-  text-align: center;
-  color: var(--pink-deep);
-  background: var(--pink-50);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
-}
-
-.gate-pin-digit:focus {
-  border-color: var(--pink-400);
-  box-shadow: 0 0 0 4px var(--pink-100);
-  transform: scale(1.06);
-}
-
-.gate-pin-digit.filled {
-  border-color: var(--pink-300);
-  background: white;
-}
-
-.gate-error {
-  min-height: 1.4em;
-  color: var(--pink-deep);
-  font-weight: 600;
-  margin: 14px 0 0;
-}
-
 #hearts-bg {
   position: fixed;
   inset: 0;
@@ -234,6 +118,8 @@ body {
   font-size: clamp(1.3rem, 4vw, 1.8rem);
   color: var(--pink-500);
   text-shadow: none;
+  text-align: center;
+  margin: 0 0 30px;
 }
 
 .btn-primary,
@@ -263,6 +149,16 @@ body {
 .btn-primary:hover,
 .btn-secondary:hover {
   transform: translateY(-3px) scale(1.03);
+}
+
+.btn-pulse {
+  animation: btnPulse 0.45s ease;
+}
+
+@keyframes btnPulse {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.18); }
+  100% { transform: scale(1); }
 }
 
 /* ============ Section titles ============ */
@@ -298,7 +194,7 @@ body {
 
 .note-card {
   max-width: 700px;
-  margin: 0 auto;
+  margin: 0 auto 50px;
   text-align: center;
   border: 2px dashed var(--pink-200);
 }
@@ -447,13 +343,13 @@ body {
 
 .puzzle-board {
   position: relative;
-  width: min(380px, 86vw);
+  width: min(460px, 92vw);
   aspect-ratio: 1 / 1;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 5px;
-  padding: 12px;
+  gap: 3px;
+  padding: 8px;
   background: white;
   border-radius: 24px;
   box-shadow: var(--shadow);
