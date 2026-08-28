@@ -303,26 +303,6 @@ body {
   transform: translateY(-3px) scale(1.03);
 }
 
-.scroll-cue {
-  position: absolute;
-  bottom: 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: var(--pink-500);
-  font-size: 0.8rem;
-  animation: bounce 2s infinite;
-}
-
-.scroll-arrow {
-  font-size: 1.3rem;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
-}
-
 /* ============ Section titles ============ */
 .section-title {
   font-family: var(--font-display);
