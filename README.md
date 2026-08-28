@@ -16,9 +16,12 @@ photo gallery.
    `index.html` to match your filenames). Until you add photos, those spots
    show a cute placeholder.
 4. **The surprise page** — open `surprise.html` and edit the message marked
-   `<!-- EDIT ME -->`, then drop photos into `assets/photos/surprise/` named
-   `photo1.jpg` through `photo4.jpg` (or add/remove `<figure>` blocks and
-   update filenames to match).
+   `<!-- EDIT ME -->`. The "memory lane" section below it is a timeline of
+   4 photo+text rows (alternating left/right, animating in as you scroll) —
+   drop photos into `assets/photos/surprise/` named `photo1.jpg` through
+   `photo4.jpg`, and edit each row's `<h3>` and `<p>` text. To add or remove
+   a memory, copy/delete a whole `.timeline-item` block and alternate
+   `side-left`/`side-right` classes.
 
 ## Publish it with GitHub Pages
 
