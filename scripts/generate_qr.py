@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Generate a cute, pastel-pink, heart-framed QR code pointing at the birthday site.
+"""Generate a cute pastel-pink "polaroid" QR code card pointing at the birthday site.
+
+Style: soft pink background with hand-drawn heart doodles, a white polaroid
+photo pinned with a little clothespin, a peeking teddy bear, and the QR code
+with a handwritten caption underneath.
 
 Usage:
     python3 scripts/generate_qr.py [URL]
@@ -17,270 +21,151 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 DEFAULT_URL = "https://azzexxy.github.io/liefje/"
 CAPTION = "scan voor een leuke surprise :)"
+TAGLINE = "hier is een toffe verrassing voor jou!!"
 
 # Deep-enough pink for reliable scanning, kept inside the pastel palette.
 QR_FILL = (198, 40, 105)      # raspberry pink modules
 QR_BACK = (255, 245, 248)     # near-white blush background
-CARD_TOP = (255, 223, 235)    # pastel pink gradient top
-CARD_MID = (255, 173, 206)    # bubblegum pink gradient middle
-CARD_BOTTOM = (240, 110, 160) # deeper pink gradient bottom
+
+BG_TOP = (255, 220, 234)
+BG_BOTTOM = (255, 197, 218)
+DOODLE = (224, 120, 152, 150)
 OUTLINE = (216, 60, 116)
 WHITE = (255, 255, 255)
-PAGE_BG = (255, 248, 251)     # soft blush white behind the whole card
+SHADOW = (214, 51, 108, 70)
 
-HEART_CANVAS = 1400   # square area the heart itself occupies
-CAPTION_STRIP = 230   # extra height below the heart for the caption
+BEAR_FUR = (233, 196, 163)
+BEAR_FUR_DARK = (210, 165, 128)
+BEAR_BLUSH = (255, 170, 190, 140)
+PIN_WOOD = (240, 205, 170)
+PIN_WOOD_DARK = (205, 160, 120)
+
+CANVAS_W = 1180
+CANVAS_H = 2000
 SUPERSAMPLE = 2
 
 FONT_DIR = Path(__file__).resolve().parent / "fonts"
 SCRIPT_FONT = FONT_DIR / "DancingScript-Bold.ttf"
 
-random.seed(7)  # stable, repeatable sparkle placement
+random.seed(11)
 
 
-def heart_points(cx, cy, size, steps=400):
-    """Parametric heart curve. `size` is a small unit (~1-20 typical) — NOT a pixel size."""
+def heart_points(cx, cy, size, steps=200, jitter=0.0, seed_offset=0):
+    """Parametric heart curve. `size` is a small unit (~1-20) — NOT a pixel size."""
     points = []
+    rnd = random.Random(seed_offset)
     for i in range(steps):
         t = (i / steps) * 2 * math.pi
         x = 16 * math.sin(t) ** 3
         y = 13 * math.cos(t) - 5 * math.cos(2 * t) - 2 * math.cos(3 * t) - math.cos(4 * t)
+        if jitter:
+            x += rnd.uniform(-jitter, jitter)
+            y += rnd.uniform(-jitter, jitter)
         points.append((cx + x * size, cy - y * size))
     return points
 
 
-def star_points(cx, cy, r_outer, r_inner=None, points=5, rotation=0):
-    r_inner = r_inner or r_outer * 0.42
-    pts = []
-    step = math.pi / points
-    for i in range(points * 2):
-        r = r_outer if i % 2 == 0 else r_inner
-        a = i * step - math.pi / 2 + rotation
-        pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
-    return pts
+def rotate_points(points, cx, cy, degrees):
+    a = math.radians(degrees)
+    ca, sa = math.cos(a), math.sin(a)
+    out = []
+    for x, y in points:
+        dx, dy = x - cx, y - cy
+        out.append((cx + dx * ca - dy * sa, cy + dx * sa + dy * ca))
+    return out
 
 
 def lerp_color(c1, c2, t):
     return tuple(int(c1[i] * (1 - t) + c2[i] * t) for i in range(3))
 
 
-def make_heart_card(canvas_size):
-    """Returns (RGBA heart image, cx, cy, scale) where `scale` converts the
-    heart curve's natural units (~±16 across) into pixels for this canvas."""
-    img = Image.new("RGBA", (canvas_size, canvas_size), (0, 0, 0, 0))
-
-    cx, cy = canvas_size / 2, canvas_size / 2 - canvas_size * 0.03
-    scale = canvas_size / 34
-    pts = heart_points(cx, cy, scale)
-
-    # --- soft drop shadow behind the heart ---
-    shadow = Image.new("RGBA", (canvas_size, canvas_size), (0, 0, 0, 0))
-    sdraw = ImageDraw.Draw(shadow)
-    shadow_pts = heart_points(cx, cy + canvas_size * 0.018, scale * 1.01)
-    sdraw.polygon(shadow_pts, fill=(214, 51, 108, 90))
-    shadow = shadow.filter(ImageFilter.GaussianBlur(canvas_size * 0.02))
-    img.alpha_composite(shadow)
-
-    # --- gradient fill (3-stop, top->bottom), with a soft gloss blended in ---
-    mask = Image.new("L", (canvas_size, canvas_size), 0)
-    mdraw = ImageDraw.Draw(mask)
-    mdraw.polygon(pts, fill=255)
-
-    gradient = Image.new("RGB", (canvas_size, canvas_size), CARD_BOTTOM)
-    gdraw = ImageDraw.Draw(gradient)
-    for y in range(canvas_size):
-        t = y / canvas_size
-        if t < 0.5:
-            color = lerp_color(CARD_TOP, CARD_MID, t / 0.5)
-        else:
-            color = lerp_color(CARD_MID, CARD_BOTTOM, (t - 0.5) / 0.5)
-        gdraw.line([(0, y), (canvas_size, y)], fill=color)
-
-    gloss_mask = Image.new("L", (canvas_size, canvas_size), 0)
-    gmdraw = ImageDraw.Draw(gloss_mask)
-    gloss_cx, gloss_cy = cx - scale * 5.5, cy - scale * 8
-    gmdraw.ellipse(
-        [gloss_cx - scale * 5.5, gloss_cy - scale * 3.2, gloss_cx + scale * 5.5, gloss_cy + scale * 3.2],
-        fill=110,
-    )
-    gloss_mask = gloss_mask.filter(ImageFilter.GaussianBlur(canvas_size * 0.02))
-    white_layer = Image.new("RGB", (canvas_size, canvas_size), WHITE)
-    gradient.paste(white_layer, (0, 0), gloss_mask)
-
-    heart_layer = Image.new("RGBA", (canvas_size, canvas_size), (0, 0, 0, 0))
-    heart_layer.paste(gradient, (0, 0), mask)
-    img.alpha_composite(heart_layer)
-
+def draw_background(canvas_size_w, canvas_size_h):
+    img = Image.new("RGB", (canvas_size_w, canvas_size_h), BG_BOTTOM)
     draw = ImageDraw.Draw(img)
-
-    # --- dotted "stitched plush toy" border, just inside the heart edge ---
-    dot_r = canvas_size * 0.0055
-    inset_pts = heart_points(cx, cy, scale * 0.965)
-    for i in range(0, len(inset_pts), 7):
-        x, y = inset_pts[i]
-        draw.ellipse([x - dot_r, y - dot_r, x + dot_r, y + dot_r], fill=(255, 255, 255, 130))
-
-    # --- solid outline ---
-    draw.line(pts + [pts[0]], fill=OUTLINE, width=max(3, canvas_size // 300), joint="curve")
-
-    return img, cx, cy, scale
+    for y in range(canvas_size_h):
+        t = y / canvas_size_h
+        draw.line([(0, y), (canvas_size_w, y)], fill=lerp_color(BG_TOP, BG_BOTTOM, t))
+    return img
 
 
-def add_bow(img, cx, cy, scale):
-    """Little ribbon bow sitting just above the heart's top cleft."""
-    draw = ImageDraw.Draw(img, "RGBA")
-    bow_cy = cy - scale * 11.6
-    knot_r = scale * 0.7
-    ribbon = CARD_MID + (255,)
-    outline = OUTLINE + (255,)
-
-    # left loop
-    left = [
-        (cx - knot_r * 0.3, bow_cy),
-        (cx - scale * 2.6, bow_cy - scale * 1.3),
-        (cx - scale * 2.8, bow_cy + scale * 0.9),
-    ]
-    draw.polygon(left, fill=ribbon, outline=outline)
-    # right loop
-    right = [
-        (cx + knot_r * 0.3, bow_cy),
-        (cx + scale * 2.6, bow_cy - scale * 1.3),
-        (cx + scale * 2.8, bow_cy + scale * 0.9),
-    ]
-    draw.polygon(right, fill=ribbon, outline=outline)
-    # tails
-    draw.polygon(
-        [(cx - knot_r * 0.15, bow_cy + scale * 0.25),
-         (cx - scale * 1.15, bow_cy + scale * 2.0),
-         (cx - scale * 0.45, bow_cy + scale * 1.75)],
-        fill=ribbon, outline=outline,
-    )
-    draw.polygon(
-        [(cx + knot_r * 0.15, bow_cy + scale * 0.25),
-         (cx + scale * 1.15, bow_cy + scale * 2.0),
-         (cx + scale * 0.45, bow_cy + scale * 1.75)],
-        fill=ribbon, outline=outline,
-    )
-    # knot
-    draw.ellipse(
-        [cx - knot_r, bow_cy - knot_r * 0.75, cx + knot_r, bow_cy + knot_r * 0.75],
-        fill=ribbon, outline=outline,
-    )
-    # tiny shine dot for a glossy touch
-    draw.ellipse(
-        [cx - knot_r * 0.4, bow_cy - knot_r * 0.45, cx, bow_cy - knot_r * 0.05],
-        fill=(255, 255, 255, 200),
-    )
+def add_doodle_hearts(img, canvas_w, canvas_h):
+    # heart_points' size unit gives a half-width of size*16 px, so divide the
+    # desired pixel half-width by 16 to get the size argument.
+    overlay = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    rnd = random.Random(42)
+    n = 16
+    for i in range(n):
+        cx = rnd.uniform(canvas_w * 0.05, canvas_w * 0.95)
+        cy = rnd.uniform(canvas_h * 0.04, canvas_h * 0.96)
+        half_width_px = rnd.uniform(canvas_w * 0.03, canvas_w * 0.075)
+        size = half_width_px / 16
+        angle = rnd.uniform(-25, 25)
+        pts = heart_points(0, 0, size, steps=200)
+        pts = rotate_points(pts, 0, 0, angle)
+        pts = [(cx + x, cy + y) for x, y in pts]
+        width = max(2, int(canvas_w * 0.0035))
+        draw.line(pts + [pts[0]], fill=DOODLE, width=width, joint="curve")
+    img.paste(overlay, (0, 0), overlay)
 
 
-def add_decorations(img, cx, cy, scale, canvas_size):
-    draw = ImageDraw.Draw(img, "RGBA")
+def draw_bear(draw, cx, cy, r):
+    """Simple flat teddy-bear head, peeking, drawn with (cx, cy) as head center."""
+    ear_r = r * 0.42
+    ear_off_x = r * 0.72
+    ear_off_y = r * 0.68
+    for sign in (-1, 1):
+        ex, ey = cx + sign * ear_off_x, cy - ear_off_y
+        draw.ellipse([ex - ear_r, ey - ear_r, ex + ear_r, ey + ear_r], fill=BEAR_FUR)
+        inner_r = ear_r * 0.55
+        draw.ellipse([ex - inner_r, ey - inner_r, ex + inner_r, ey + inner_r], fill=BEAR_FUR_DARK)
 
-    small_hearts = [
-        (cx - scale * 13.5, cy - scale * 10.5, 1.7, (255, 255, 255, 220)),
-        (cx + scale * 13, cy - scale * 11.5, 1.3, (255, 255, 255, 200)),
-        (cx - scale * 11.5, cy + scale * 15.5, 1.1, (255, 255, 255, 190)),
-        (cx + scale * 12, cy + scale * 14.5, 1.4, (255, 255, 255, 190)),
-        (cx - scale * 6, cy - scale * 15, 0.8, (255, 255, 255, 170)),
-        (cx + scale * 6.5, cy - scale * 14.5, 0.6, (255, 255, 255, 160)),
-    ]
-    for hx, hy, s, color in small_hearts:
-        pts = heart_points(hx, hy, s)
-        draw.polygon(pts, fill=color)
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=BEAR_FUR)
 
-    # twinkly little 4-point sparkles scattered around
-    sparkle_spots = [
-        (cx - scale * 9, cy - scale * 4, 0.55),
-        (cx + scale * 10, cy - scale * 1, 0.45),
-        (cx - scale * 12, cy + scale * 6, 0.4),
-        (cx + scale * 11.5, cy + scale * 7, 0.5),
-        (cx - scale * 3, cy + scale * 19, 0.35),
-        (cx + scale * 3.5, cy + scale * 18.5, 0.3),
-    ]
-    for sx, sy, s in sparkle_spots:
-        r = scale * s
-        draw.polygon(star_points(sx, sy, r, r * 0.28, points=4), fill=(255, 255, 255, 235))
+    # muzzle
+    muzzle_w, muzzle_h = r * 0.62, r * 0.46
+    draw.ellipse([cx - muzzle_w / 2, cy + r * 0.08, cx + muzzle_w / 2, cy + r * 0.08 + muzzle_h],
+                 fill=(250, 240, 230))
 
-    # tiny orbiting dots for extra sparkle dust
-    for _ in range(14):
-        angle = random.uniform(0, 2 * math.pi)
-        dist = random.uniform(scale * 13.5, scale * 16.5)
-        dx, dy = cx + math.cos(angle) * dist, cy + math.sin(angle) * dist * 0.9
-        if dy > cy + scale * 17.5:
-            continue
-        r = random.uniform(canvas_size * 0.0025, canvas_size * 0.006)
-        draw.ellipse([dx - r, dy - r, dx + r, dy + r], fill=(255, 255, 255, random.randint(120, 210)))
+    # eyes
+    eye_r = r * 0.06
+    eye_y = cy - r * 0.02
+    for sign in (-1, 1):
+        ex = cx + sign * r * 0.28
+        draw.ellipse([ex - eye_r, eye_y - eye_r, ex + eye_r, eye_y + eye_r], fill=(80, 55, 45))
 
+    # blush cheeks, just outside the muzzle at eye level
+    blush_r = r * 0.15
+    blush_y = eye_y + r * 0.12
+    draw.ellipse([cx - r * 0.55 - blush_r, blush_y - blush_r,
+                  cx - r * 0.55 + blush_r, blush_y + blush_r], fill=BEAR_BLUSH)
+    draw.ellipse([cx + r * 0.55 - blush_r, blush_y - blush_r,
+                  cx + r * 0.55 + blush_r, blush_y + blush_r], fill=BEAR_BLUSH)
 
-def make_qr(url, box_scale):
-    qr = qrcode.QRCode(
-        error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=box_scale,
-        border=2,
-    )
-    qr.add_data(url)
-    qr.make(fit=True)
-    return qr.make_image(fill_color=QR_FILL, back_color=QR_BACK).convert("RGB")
+    # nose
+    nose_r = r * 0.09
+    nose_y = cy + r * 0.22
+    draw.ellipse([cx - nose_r, nose_y - nose_r * 0.8, cx + nose_r, nose_y + nose_r * 0.8],
+                 fill=(120, 80, 65))
 
 
-def add_plate_corner_hearts(img, plate_x, plate_y, plate_size):
-    """Tiny heart accents at the corners of the white QR plate.
-
-    `heart_points`'s size unit is small (a value of ~3 gives a heart roughly
-    plate_size * 0.07 wide) — do not scale this by canvas_size or it balloons.
-    """
-    draw = ImageDraw.Draw(img, "RGBA")
-    corner_offset = plate_size * 0.06
-    corner_heart_size = 2.2
-    corners = [
-        (plate_x - corner_offset, plate_y - corner_offset),
-        (plate_x + plate_size + corner_offset, plate_y - corner_offset),
-        (plate_x - corner_offset, plate_y + plate_size + corner_offset),
-        (plate_x + plate_size + corner_offset, plate_y + plate_size + corner_offset),
-    ]
-    for hx, hy in corners:
-        pts = heart_points(hx, hy, corner_heart_size, steps=60)
-        draw.polygon(pts, fill=(214, 51, 108, 255))
+def draw_clothespin(draw, cx, top_y, width, height):
+    """A little wooden clothespin straddling the top edge of the polaroid."""
+    x0, x1 = cx - width / 2, cx + width / 2
+    y0, y1 = top_y, top_y + height
+    radius = width * 0.28
+    draw.rounded_rectangle([x0, y0, x1, y1], radius=radius, fill=PIN_WOOD, outline=PIN_WOOD_DARK,
+                            width=max(2, int(width * 0.05)))
+    # metal spring band
+    band_y = top_y + height * 0.42
+    draw.rectangle([x0 + width * 0.08, band_y, x1 - width * 0.08, band_y + height * 0.09],
+                    fill=PIN_WOOD_DARK)
+    # gap between the two legs
+    draw.line([(cx, band_y + height * 0.09), (cx, y1 - height * 0.05)],
+               fill=PIN_WOOD_DARK, width=max(2, int(width * 0.06)))
 
 
-def build_card(canvas_size, url):
-    card, cx, cy, scale = make_heart_card(canvas_size)
-    add_decorations(card, cx, cy, scale, canvas_size)
-    add_bow(card, cx, cy, scale)
-
-    qr_target_size = int(canvas_size * 0.38)
-    box_scale = max(4, qr_target_size // 45)
-    qr_img = make_qr(url, box_scale)
-    qr_img = qr_img.resize((qr_target_size, qr_target_size), Image.NEAREST)
-
-    pad = int(qr_target_size * 0.09)
-    plate_size = qr_target_size + pad * 2
-    plate = Image.new("RGB", (plate_size, plate_size), WHITE)
-    plate_draw = ImageDraw.Draw(plate)
-    radius = int(plate_size * 0.1)
-    plate_draw.rounded_rectangle([0, 0, plate_size - 1, plate_size - 1], radius=radius, fill=WHITE)
-    plate.paste(qr_img, (pad, pad))
-
-    plate_mask = Image.new("L", (plate_size, plate_size), 0)
-    pmdraw = ImageDraw.Draw(plate_mask)
-    pmdraw.rounded_rectangle([0, 0, plate_size - 1, plate_size - 1], radius=radius, fill=255)
-
-    plate_x = int(cx - plate_size / 2)
-    plate_y = int(cy - plate_size / 2 - canvas_size * 0.03)
-
-    add_plate_corner_hearts(card, plate_x, plate_y, plate_size)
-
-    # dotted pink border around the white plate
-    border_draw = ImageDraw.Draw(card, "RGBA")
-    rect = [plate_x - 6, plate_y - 6, plate_x + plate_size + 6, plate_y + plate_size + 6]
-    border_draw.rounded_rectangle(rect, radius=radius, outline=OUTLINE + (255,), width=max(3, plate_size // 220))
-
-    card.paste(plate, (plate_x, plate_y), plate_mask)
-
-    return card, cx, plate_y + plate_size
-
-
-def fit_caption_font(draw, text, max_width, start_size, min_size):
+def fit_font(draw, text, max_width, start_size, min_size):
     font_size = start_size
     font = None
     while font_size > min_size:
@@ -289,37 +174,116 @@ def fit_caption_font(draw, text, max_width, start_size, min_size):
         bbox = draw.textbbox((0, 0), text, font=font)
         if bbox[2] - bbox[0] <= max_width:
             return font, bbox
-        font_size = int(font_size * 0.93)
+        font_size = int(font_size * 0.94)
     return font, draw.textbbox((0, 0), text, font=font)
+
+
+def make_qr(url, box_scale):
+    qr = qrcode.QRCode(
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=box_scale,
+        border=3,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+    return qr.make_image(fill_color=QR_FILL, back_color=QR_BACK).convert("RGB")
+
+
+def build_polaroid_layer(url, canvas_w):
+    polaroid_w = canvas_w * 0.72
+    side_margin = polaroid_w * 0.045
+    top_margin = side_margin
+    photo_size = polaroid_w - 2 * side_margin
+    bottom_margin = polaroid_w * 0.34
+    polaroid_h = top_margin + photo_size + bottom_margin
+
+    pad_left = polaroid_w * 0.06
+    pad_right_bear = polaroid_w * 0.30
+    pad_top_pin = polaroid_w * 0.16
+    pad_bottom = polaroid_w * 0.05
+
+    layer_w = int(polaroid_w + pad_left + pad_right_bear)
+    layer_h = int(polaroid_h + pad_top_pin + pad_bottom)
+    layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
+
+    polaroid_x = pad_left
+    polaroid_y = pad_top_pin
+
+    # --- bear peeking from behind the top-right corner ---
+    bear_r = photo_size * 0.20
+    bear_cx = polaroid_x + polaroid_w - photo_size * 0.02
+    bear_cy = polaroid_y + photo_size * 0.06
+    draw = ImageDraw.Draw(layer)
+    draw_bear(draw, bear_cx, bear_cy, bear_r)
+
+    # --- drop shadow for the polaroid ---
+    shadow_layer = Image.new("RGBA", (layer_w, layer_h), (0, 0, 0, 0))
+    sdraw = ImageDraw.Draw(shadow_layer)
+    off = polaroid_w * 0.015
+    sdraw.rectangle([polaroid_x + off, polaroid_y + off * 1.6,
+                      polaroid_x + polaroid_w + off, polaroid_y + polaroid_h + off * 1.6],
+                     fill=SHADOW)
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(polaroid_w * 0.018))
+    layer.alpha_composite(shadow_layer)
+
+    # --- white polaroid card ---
+    draw.rectangle([polaroid_x, polaroid_y, polaroid_x + polaroid_w, polaroid_y + polaroid_h],
+                    fill=WHITE)
+
+    # --- QR code inside the photo area ---
+    qr_target = int(photo_size * 0.86)
+    box_scale = max(4, qr_target // 45)
+    qr_img = make_qr(url, box_scale).resize((qr_target, qr_target), Image.NEAREST)
+    qr_x = int(polaroid_x + (polaroid_w - qr_target) / 2)
+    qr_y = int(polaroid_y + top_margin + (photo_size - qr_target) / 2)
+    layer.paste(qr_img, (qr_x, qr_y))
+    draw.rectangle([qr_x, qr_y, qr_x + qr_target, qr_y + qr_target], outline=(230, 200, 212), width=2)
+
+    # --- caption in the polaroid's bottom margin ---
+    caption_cx = polaroid_x + polaroid_w / 2
+    caption_area_top = polaroid_y + top_margin + photo_size
+    font, bbox = fit_font(draw, CAPTION, polaroid_w * 0.86,
+                           start_size=int(bottom_margin * 0.34), min_size=int(bottom_margin * 0.14))
+    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    text_y = caption_area_top + (bottom_margin - th) / 2 - bbox[1]
+    draw.text((caption_cx - tw / 2 - bbox[0], text_y), CAPTION, font=font, fill=OUTLINE)
+
+    # small heart accents flanking the caption (heart_points size unit: half-width = size*16px)
+    flank_size = (polaroid_w * 0.022) / 16
+    heart_y = text_y + bbox[1] + th * 0.5
+    draw.polygon(heart_points(caption_cx - tw / 2 - polaroid_w * 0.05, heart_y, flank_size), fill=OUTLINE)
+    draw.polygon(heart_points(caption_cx + tw / 2 + polaroid_w * 0.05, heart_y, flank_size), fill=OUTLINE)
+
+    # --- clothespin straddling the top edge ---
+    pin_w = polaroid_w * 0.13
+    pin_h = pad_top_pin * 0.82
+    draw_clothespin(draw, polaroid_x + polaroid_w / 2, polaroid_y - pin_h * 0.62, pin_w, pin_h)
+
+    return layer
 
 
 def main():
     url = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_URL
-    heart_size = HEART_CANVAS * SUPERSAMPLE
-    strip_h = CAPTION_STRIP * SUPERSAMPLE
-    final_w, final_h = heart_size, heart_size + strip_h
+    cw = CANVAS_W * SUPERSAMPLE
+    ch = CANVAS_H * SUPERSAMPLE
 
-    card, cx, plate_bottom_y = build_card(heart_size, url)
+    bg = draw_background(cw, ch)
+    add_doodle_hearts(bg, cw, ch)
 
-    page = Image.new("RGB", (final_w, final_h), PAGE_BG)
-    page.paste(card, (0, 0), card)
+    polaroid_layer = build_polaroid_layer(url, cw)
+    polaroid_layer = polaroid_layer.rotate(-3, resample=Image.BICUBIC, expand=True)
 
-    draw = ImageDraw.Draw(page)
-    max_text_width = final_w * 0.86
-    font, bbox = fit_caption_font(
-        draw, CAPTION, max_text_width,
-        start_size=int(strip_h * 0.34), min_size=int(strip_h * 0.12),
-    )
+    px = int((cw - polaroid_layer.width) / 2)
+    py = int(ch * 0.06)
+    bg.paste(polaroid_layer, (px, py), polaroid_layer)
+
+    draw = ImageDraw.Draw(bg)
+    tagline_y_center = py + polaroid_layer.height + (ch - (py + polaroid_layer.height)) * 0.42
+    font, bbox = fit_font(draw, TAGLINE, cw * 0.86, start_size=int(cw * 0.052), min_size=int(cw * 0.02))
     tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    text_y = heart_size + (strip_h - th) / 2 - bbox[1] - strip_h * 0.08
-    draw.text((cx - tw / 2 - bbox[0], text_y), CAPTION, font=font, fill=OUTLINE)
+    draw.text((cw / 2 - tw / 2 - bbox[0], tagline_y_center - th / 2 - bbox[1]), TAGLINE, font=font, fill=OUTLINE)
 
-    flank_size = 1.6
-    heart_y = text_y + bbox[1] + th * 0.5
-    draw.polygon(heart_points(cx - tw / 2 - final_w * 0.05, heart_y, flank_size), fill=OUTLINE)
-    draw.polygon(heart_points(cx + tw / 2 + final_w * 0.05, heart_y, flank_size), fill=OUTLINE)
-
-    final = page.resize((HEART_CANVAS, HEART_CANVAS + CAPTION_STRIP), Image.LANCZOS)
+    final = bg.resize((CANVAS_W, CANVAS_H), Image.LANCZOS)
 
     out_path = Path(__file__).resolve().parent.parent / "assets" / "qr-code.png"
     out_path.parent.mkdir(parents=True, exist_ok=True)
