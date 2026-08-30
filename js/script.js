@@ -1,3 +1,8 @@
+// ============ Admin panel link (update after deploying the backend in server/) ============
+const ADMIN_PANEL_URL = "https://YOUR-RENDER-URL.onrender.com/admin.html";
+const adminGear = document.getElementById("adminGear");
+if (adminGear) adminGear.href = ADMIN_PANEL_URL;
+
 // ============ Floating background hearts ============
 const heartsBg = document.getElementById("hearts-bg");
 const HEART_CHARS = ["💗", "💕", "💖", "🌸", "♥"];
@@ -144,9 +149,10 @@ const puzzleBoard = document.getElementById("puzzleBoard");
 if (puzzleBoard) {
   const GRID = 3;
   const imageUrl = puzzleBoard.dataset.image;
+  const PUZZLE_SOLVED_KEY = "liefje_puzzle_solved";
   let tiles = [];
   let selectedIndex = null;
-  let solved = false;
+  let solved = localStorage.getItem(PUZZLE_SOLVED_KEY) === "1";
   let imageAvailable = false;
 
   function shuffledTiles() {
@@ -206,26 +212,31 @@ if (puzzleBoard) {
     checkSolved();
   }
 
-  function checkSolved() {
-    const isSolved = tiles.every((v, i) => v === i);
-    if (!isSolved) return;
-    solved = true;
-    puzzleBoard.classList.add("solved");
-    const msg = document.getElementById("puzzleMsg");
-    if (msg) msg.textContent = "Opgelost! 🎉";
-    const rect = puzzleBoard.getBoundingClientRect();
-    burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 220);
-
+  function revealLockedContent(withScroll) {
     document.querySelectorAll(".locked-content").forEach((el) => {
       el.classList.remove("locked-content");
       el.classList.add("reveal-fade");
       requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("shown")));
     });
+    if (withScroll) {
+      setTimeout(() => {
+        const target = document.getElementById("cakeReveal");
+        if (target) target.scrollIntoView({ behavior: "smooth" });
+      }, 900);
+    }
+  }
 
-    setTimeout(() => {
-      const target = document.getElementById("cakeReveal");
-      if (target) target.scrollIntoView({ behavior: "smooth" });
-    }, 900);
+  function checkSolved() {
+    const isSolved = tiles.every((v, i) => v === i);
+    if (!isSolved) return;
+    solved = true;
+    localStorage.setItem(PUZZLE_SOLVED_KEY, "1");
+    puzzleBoard.classList.add("solved");
+    const msg = document.getElementById("puzzleMsg");
+    if (msg) msg.textContent = "Opgelost! 🎉";
+    const rect = puzzleBoard.getBoundingClientRect();
+    burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 220);
+    revealLockedContent(true);
   }
 
   const probe = new Image();
@@ -239,8 +250,17 @@ if (puzzleBoard) {
   };
   probe.src = imageUrl;
 
-  tiles = shuffledTiles();
+  // Already solved on a previous visit (remembered on this device) — show the
+  // completed picture straight away instead of making her solve it again.
+  tiles = solved ? Array.from({ length: GRID * GRID }, (_, i) => i) : shuffledTiles();
   render();
+
+  if (solved) {
+    puzzleBoard.classList.add("solved");
+    const msg = document.getElementById("puzzleMsg");
+    if (msg) msg.textContent = "Alweer opgelost! 💗";
+    revealLockedContent(false);
+  }
 }
 
 // ============ 21 candles: the final wish before the memories unlock ============
@@ -314,6 +334,10 @@ if (candlesRow && blowBigBtn) {
   if (!timeline || !continueBadge) return;
 
   const ROT_CLASSES = ["rot-1", "rot-2", "rot-3", "rot-4"];
+  const AUTHORS = {
+    Lothar: { name: "Lothar", avatar: "assets/avatars/lothar.png" },
+    Charlotte: { name: "Charlotte", avatar: "assets/avatars/charlotte.png" },
+  };
 
   function buildTimelineItem(memory, index) {
     const side = memory.side === "left" || memory.side === "right" ? memory.side : index % 2 === 0 ? "left" : "right";
@@ -356,6 +380,23 @@ if (candlesRow && blowBigBtn) {
     h3.textContent = memory.title || "";
     text.appendChild(dateP);
     text.appendChild(h3);
+
+    const author = AUTHORS[memory.addedBy];
+    if (author) {
+      const authorRow = document.createElement("div");
+      authorRow.className = "memory-author";
+      const avatar = document.createElement("img");
+      avatar.className = "memory-author-avatar";
+      avatar.src = author.avatar;
+      avatar.alt = author.name;
+      avatar.addEventListener("error", () => avatar.remove());
+      const name = document.createElement("span");
+      name.className = "memory-author-name";
+      name.textContent = `toegevoegd door ${author.name}`;
+      authorRow.appendChild(avatar);
+      authorRow.appendChild(name);
+      text.appendChild(authorRow);
+    }
 
     item.appendChild(photoWrap);
     item.appendChild(node);

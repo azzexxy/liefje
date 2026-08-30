@@ -1,8 +1,12 @@
 const banner = document.getElementById("banner");
 const whoami = document.getElementById("whoami");
+const whoamiAvatar = document.getElementById("whoamiAvatar");
+const whoamiText = document.getElementById("whoamiText");
 const loginForm = document.getElementById("loginForm");
 const memoryForm = document.getElementById("memoryForm");
 const submitBtn = document.getElementById("submitBtn");
+
+const AVATARS = { Lothar: "avatars/lothar.png", Charlotte: "avatars/charlotte.png" };
 
 function showBanner(message, type) {
   banner.textContent = message;
@@ -37,7 +41,15 @@ function showLoggedIn(username) {
   loginForm.hidden = true;
   memoryForm.hidden = false;
   whoami.hidden = false;
-  whoami.textContent = `ingelogd als ${username}`;
+  whoamiText.textContent = `ingelogd als ${username}`;
+  const avatarSrc = AVATARS[username];
+  if (avatarSrc) {
+    whoamiAvatar.src = avatarSrc;
+    whoamiAvatar.alt = username;
+    whoamiAvatar.hidden = false;
+  } else {
+    whoamiAvatar.hidden = true;
+  }
 }
 
 function showLoggedOut() {

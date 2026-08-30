@@ -88,7 +88,16 @@
   .banner.error { display: block; background: #ffe3e3; color: #a3302f; }
   .banner.success { display: block; background: #e3f9ea; color: #226a3f; }
   .hint { font-size: 0.8rem; opacity: 0.7; margin-top: 4px; }
-  #whoami { text-align: center; font-size: 0.85rem; margin-bottom: 14px; opacity: 0.75; }
+  #whoami {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 14px;
+    opacity: 0.85;
+  }
+  #whoami img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--pink-200); }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -97,7 +106,10 @@
     <h1>herinnering toevoegen 💗</h1>
     <p class="sub">enkel voor ons tweetjes</p>
 
-    <div id="whoami" hidden></div>
+    <div id="whoami" hidden>
+      <img id="whoamiAvatar" src="" alt="" />
+      <span id="whoamiText"></span>
+    </div>
     <div id="banner" class="banner"></div>
 
     <form id="loginForm">

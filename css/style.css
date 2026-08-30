@@ -619,6 +619,57 @@ body {
   line-height: 1.6;
 }
 
+/* ============ "added by" badge on memories posted through the admin panel ============ */
+.memory-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.timeline-item.side-right .memory-author {
+  justify-content: flex-end;
+}
+
+.memory-author-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--white);
+  box-shadow: 0 0 0 1px var(--pink-200);
+  object-fit: cover;
+}
+
+.memory-author-name {
+  font-size: 0.85rem;
+  color: var(--pink-deep);
+  opacity: 0.85;
+}
+
+/* ============ gear icon linking to the private admin panel ============ */
+.admin-gear {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px dashed var(--pink-200);
+  font-size: 1.1rem;
+  text-decoration: none;
+  opacity: 0.55;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.admin-gear:hover {
+  opacity: 1;
+  transform: rotate(25deg);
+}
+
 @media (max-width: 700px) {
   .timeline-track,
   .timeline-fill,

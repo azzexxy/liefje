@@ -6,6 +6,7 @@ const cookieSession = require("cookie-session");
 const authRoutes = require("./src/routes/auth");
 const memoriesRoutes = require("./src/routes/memories");
 const { GitHubError } = require("./src/github");
+const { CloudinaryError } = require("./src/cloudinary");
 
 if (!process.env.SESSION_SECRET) {
   console.warn("WARNING: SESSION_SECRET is not set — using an insecure default. Set it before deploying.");
@@ -24,7 +25,9 @@ app.use(
   cookieSession({
     name: "liefje_session",
     secret: process.env.SESSION_SECRET || "dev-only-secret-change-me",
-    maxAge: 30 * 24 * 60 * 60 * 1000,
+    // Long-lived on purpose: this is a private 2-person tool, so once logged
+    // in on a device it should just stay logged in rather than asking again.
+    maxAge: 365 * 24 * 60 * 60 * 1000,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   })
@@ -36,6 +39,11 @@ app.use("/api", authRoutes);
 app.use("/api/memories", memoriesRoutes);
 
 app.get("/healthz", (req, res) => res.json({ ok: true, dryRun: process.env.DRY_RUN === "true" }));
+
+// Render's health check hits "/" by default — there's no index.html in
+// public/ (only admin.html), so without this "/" 404s and the deploy gets
+// marked unhealthy even though the app is running fine.
+app.get("/", (req, res) => res.redirect("/admin.html"));
 
 app.use((req, res) => res.status(404).json({ error: "Niet gevonden." }));
 
@@ -56,7 +64,7 @@ app.use((err, req, res, next) => {
   if (err instanceof GitHubError) {
     return res.status(502).json({ error: "GitHub weigerde de wijziging op te slaan. Probeer het opnieuw." });
   }
-  if (err && err.name === "Error" && /cloudinary/i.test(err.message || "")) {
+  if (err instanceof CloudinaryError) {
     return res.status(502).json({ error: "De foto kon niet geüpload worden. Probeer het opnieuw." });
   }
 
