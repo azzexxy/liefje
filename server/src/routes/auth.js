@@ -1,9 +1,22 @@
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const { verifyCredentials } = require("../auth");
 
 const router = express.Router();
 
-router.post("/login", async (req, res) => {
+// Short passwords (e.g. a PIN) are only safe if brute-forcing them is slow.
+// This caps failed attempts per IP so guessing thousands of combinations
+// isn't practical, without punishing normal successful logins.
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { error: "Te veel inlogpogingen. Probeer het over 15 minuten opnieuw." },
+});
+
+router.post("/login", loginLimiter, async (req, res) => {
   try {
     const { username, password } = req.body || {};
     const ok = await verifyCredentials(username, password);
