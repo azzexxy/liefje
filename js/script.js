@@ -3,9 +3,12 @@
 // scroll back to the top after we've already positioned it.
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
-// ============ Admin panel link (update after deploying the backend in server/) ============
-const ADMIN_PANEL_URL = "https://YOUR-RENDER-URL.onrender.com/admin.html";
+// ============ Backend (update after deploying it — see server/) ============
+const BACKEND_URL = "https://YOUR-RENDER-URL.onrender.com";
+const ADMIN_PANEL_URL = `${BACKEND_URL}/admin.html`;
 const adminGear = document.getElementById("adminGear");
+// The href still points at the full admin page (works with JS off, or a
+// deliberate "open in new tab") — a normal click opens the inline modal below.
 if (adminGear) adminGear.href = ADMIN_PANEL_URL;
 
 // ============ Floating background hearts ============
@@ -366,137 +369,312 @@ if (candlesRow && blowBigBtn) {
   }
 })();
 
-// ============ Dynamically added memories (posted through the admin panel) ============
-// Reads assets/data/memories.json and weaves matching .timeline-item elements
-// into the right chronological spot among the existing (static) ones, based
-// on each item's dd/mm date — not just tacked onto the end. Left/right sides
-// are then recomputed by final position so the zigzag stays clean regardless
-// of where something got inserted. If the file is empty/missing/unreachable
-// this quietly does nothing, so the static timeline above is never affected.
-(function loadDynamicMemories() {
-  const timeline = document.querySelector(".memory-lane-section .timeline");
-  const continueBadge = document.querySelector(".timeline-continue");
-  if (!timeline || !continueBadge) return;
+// ============ Timeline helpers shared by the initial loader and the inline "add memory" modal ============
+// Weaves .timeline-item elements into the right chronological spot among the
+// existing (static) ones, based on each item's dd/mm date — not just tacked
+// onto the end. Left/right sides are recomputed by final position so the
+// zigzag stays clean regardless of where something got inserted.
+const timelineEl = document.querySelector(".memory-lane-section .timeline");
+const timelineContinueBadge = document.querySelector(".timeline-continue");
+const ROT_CLASSES = ["rot-1", "rot-2", "rot-3", "rot-4"];
+const AUTHORS = {
+  Lothar: { name: "Lothar", avatar: "assets/avatars/lothar.png" },
+  Charlotte: { name: "Charlotte", avatar: "assets/avatars/charlotte.png" },
+};
 
-  const ROT_CLASSES = ["rot-1", "rot-2", "rot-3", "rot-4"];
-  const AUTHORS = {
-    Lothar: { name: "Lothar", avatar: "assets/avatars/lothar.png" },
-    Charlotte: { name: "Charlotte", avatar: "assets/avatars/charlotte.png" },
-  };
+// Dates are dd/mm with no year, so this sorts within a single calendar year
+// (true for everything so far) — unparseable dates sort last instead of
+// breaking the page.
+function dateSortKey(dateStr) {
+  const m = /^(\d{1,2})\/(\d{1,2})$/.exec((dateStr || "").trim());
+  if (!m) return Number.MAX_SAFE_INTEGER;
+  return parseInt(m[2], 10) * 100 + parseInt(m[1], 10);
+}
 
-  // Dates are dd/mm with no year, so this sorts within a single calendar
-  // year (true for everything so far) — unparseable dates sort last instead
-  // of breaking the page.
-  function dateSortKey(dateStr) {
-    const m = /^(\d{1,2})\/(\d{1,2})$/.exec((dateStr || "").trim());
-    if (!m) return Number.MAX_SAFE_INTEGER;
-    return parseInt(m[2], 10) * 100 + parseInt(m[1], 10);
-  }
+function buildTimelineItem(memory) {
+  const item = document.createElement("div");
+  item.className = "timeline-item";
+  item.dataset.sortKey = String(dateSortKey(memory.date));
 
-  function buildTimelineItem(memory) {
-    const item = document.createElement("div");
-    item.className = "timeline-item";
-    item.dataset.sortKey = String(dateSortKey(memory.date));
-
-    const photoWrap = document.createElement("div");
-    photoWrap.className = "timeline-photo";
-    const photos = Array.isArray(memory.photos) ? memory.photos.filter(Boolean) : [];
-    const isGroup = photos.length > 1;
-    const photoContainer = isGroup ? document.createElement("div") : photoWrap;
-    if (isGroup) photoContainer.className = "timeline-photo-group";
-    photos.forEach((src, i) => {
-      const figure = document.createElement("figure");
-      figure.className = `polaroid ${ROT_CLASSES[i % ROT_CLASSES.length]}`;
-      const img = document.createElement("img");
-      img.src = src;
-      img.alt = memory.title || "Herinnering";
-      img.addEventListener("error", () => figure.classList.add("img-missing"));
-      figure.appendChild(img);
-      photoContainer.appendChild(figure);
-    });
-    if (isGroup) photoWrap.appendChild(photoContainer);
-
-    const node = document.createElement("div");
-    node.className = "timeline-node";
-
-    const text = document.createElement("div");
-    text.className = "timeline-text";
-    const dateP = document.createElement("p");
-    dateP.className = "timeline-date";
-    const placeSpan = document.createElement("span");
-    placeSpan.textContent = memory.place ? `📍 ${memory.place}` : "📍";
-    const daySpan = document.createElement("span");
-    daySpan.className = "timeline-day";
-    daySpan.textContent = memory.date || "";
-    dateP.appendChild(placeSpan);
-    dateP.appendChild(daySpan);
-    const h3 = document.createElement("h3");
-    h3.textContent = memory.title || "";
-    text.appendChild(dateP);
-    text.appendChild(h3);
-
-    const author = AUTHORS[memory.addedBy];
-    if (author) {
-      const authorRow = document.createElement("div");
-      authorRow.className = "memory-author";
-      const avatar = document.createElement("img");
-      avatar.className = "memory-author-avatar";
-      avatar.src = author.avatar;
-      avatar.alt = author.name;
-      avatar.addEventListener("error", () => avatar.remove());
-      const name = document.createElement("span");
-      name.className = "memory-author-name";
-      name.textContent = `toegevoegd door ${author.name}`;
-      authorRow.appendChild(avatar);
-      authorRow.appendChild(name);
-      text.appendChild(authorRow);
-    }
-
-    item.appendChild(photoWrap);
-    item.appendChild(node);
-    item.appendChild(text);
-    return item;
-  }
-
-  // Tags each existing (static) item with its sort key up front, so it can
-  // be merged with anything fetched below using the exact same comparison.
-  timeline.querySelectorAll(".timeline-item").forEach((item) => {
-    item.dataset.sortKey = String(dateSortKey(item.dataset.date));
+  const photoWrap = document.createElement("div");
+  photoWrap.className = "timeline-photo";
+  const photos = Array.isArray(memory.photos) ? memory.photos.filter(Boolean) : [];
+  const isGroup = photos.length > 1;
+  const photoContainer = isGroup ? document.createElement("div") : photoWrap;
+  if (isGroup) photoContainer.className = "timeline-photo-group";
+  photos.forEach((src, i) => {
+    const figure = document.createElement("figure");
+    figure.className = `polaroid ${ROT_CLASSES[i % ROT_CLASSES.length]}`;
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = memory.title || "Herinnering";
+    img.addEventListener("error", () => figure.classList.add("img-missing"));
+    figure.appendChild(img);
+    photoContainer.appendChild(figure);
   });
+  if (isGroup) photoWrap.appendChild(photoContainer);
 
-  function reorderByDate() {
-    const items = Array.from(timeline.querySelectorAll(".timeline-item"));
-    items.sort((a, b) => Number(a.dataset.sortKey) - Number(b.dataset.sortKey));
-    items.forEach((item, i) => {
-      item.classList.remove("side-left", "side-right");
-      item.classList.add(i % 2 === 0 ? "side-left" : "side-right");
-      timeline.insertBefore(item, continueBadge);
-    });
+  const node = document.createElement("div");
+  node.className = "timeline-node";
+
+  const text = document.createElement("div");
+  text.className = "timeline-text";
+  const dateP = document.createElement("p");
+  dateP.className = "timeline-date";
+  const placeSpan = document.createElement("span");
+  placeSpan.textContent = memory.place ? `📍 ${memory.place}` : "📍";
+  const daySpan = document.createElement("span");
+  daySpan.className = "timeline-day";
+  daySpan.textContent = memory.date || "";
+  dateP.appendChild(placeSpan);
+  dateP.appendChild(daySpan);
+  const h3 = document.createElement("h3");
+  h3.textContent = memory.title || "";
+  text.appendChild(dateP);
+  text.appendChild(h3);
+
+  const author = AUTHORS[memory.addedBy];
+  if (author) {
+    const authorRow = document.createElement("div");
+    authorRow.className = "memory-author";
+    const avatar = document.createElement("img");
+    avatar.className = "memory-author-avatar";
+    avatar.src = author.avatar;
+    avatar.alt = author.name;
+    avatar.addEventListener("error", () => avatar.remove());
+    const name = document.createElement("span");
+    name.className = "memory-author-name";
+    name.textContent = `toegevoegd door ${author.name}`;
+    authorRow.appendChild(avatar);
+    authorRow.appendChild(name);
+    text.appendChild(authorRow);
   }
+
+  item.appendChild(photoWrap);
+  item.appendChild(node);
+  item.appendChild(text);
+  return item;
+}
+
+function tagStaticTimelineItems() {
+  if (!timelineEl) return;
+  timelineEl.querySelectorAll(".timeline-item").forEach((item) => {
+    if (item.dataset.sortKey === undefined) item.dataset.sortKey = String(dateSortKey(item.dataset.date));
+  });
+}
+
+function reorderTimelineByDate() {
+  if (!timelineEl || !timelineContinueBadge) return;
+  const items = Array.from(timelineEl.querySelectorAll(".timeline-item"));
+  items.sort((a, b) => Number(a.dataset.sortKey) - Number(b.dataset.sortKey));
+  items.forEach((item, i) => {
+    item.classList.remove("side-left", "side-right");
+    item.classList.add(i % 2 === 0 ? "side-left" : "side-right");
+    timelineEl.insertBefore(item, timelineContinueBadge);
+  });
+}
+
+const timelineRevealObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("in-view");
+        timelineRevealObserver.unobserve(entry.target);
+      }
+    });
+  },
+  { threshold: 0.25 }
+);
+
+// Builds, inserts, sorts, and reveal-observes one memory — used both for
+// memories.json on load and for a memory just submitted through the modal.
+function insertMemoryIntoTimeline(memory) {
+  if (!timelineEl || !timelineContinueBadge) return null;
+  tagStaticTimelineItems();
+  const item = buildTimelineItem(memory);
+  timelineEl.insertBefore(item, timelineContinueBadge);
+  reorderTimelineByDate();
+  timelineRevealObserver.observe(item);
+  return item;
+}
+
+// ============ Dynamically added memories (posted through the admin panel) ============
+// Reads assets/data/memories.json on load. If the file is empty/missing/
+// unreachable this quietly does nothing, so the static timeline still works.
+(function loadDynamicMemories() {
+  if (!timelineEl || !timelineContinueBadge) return;
+  tagStaticTimelineItems();
 
   fetch("assets/data/memories.json", { cache: "no-store" })
     .then((res) => (res.ok ? res.json() : []))
     .then((memories) => {
       if (!Array.isArray(memories) || memories.length === 0) return;
-
-      const newItems = memories.map((memory) => buildTimelineItem(memory));
-      newItems.forEach((item) => timeline.insertBefore(item, continueBadge));
-      reorderByDate();
-
-      const dynamicObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("in-view");
-              dynamicObserver.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.25 }
-      );
-      newItems.forEach((item) => dynamicObserver.observe(item));
+      memories.forEach((memory) => insertMemoryIntoTimeline(memory));
     })
     .catch(() => {
       // no dynamic memories yet, or offline — the static timeline above still works fine
     });
+})();
+
+// ============ Inline "add memory" modal (opens from the ⚙️ instead of navigating away) ============
+(function setupMemoryModal() {
+  const modal = document.getElementById("memoryModal");
+  if (!modal) return;
+
+  const backdrop = document.getElementById("memoryModalBackdrop");
+  const closeBtn = document.getElementById("memoryModalClose");
+  const banner = document.getElementById("memoryModalBanner");
+  const whoami = document.getElementById("memoryModalWhoami");
+  const whoamiAvatar = document.getElementById("memoryModalAvatar");
+  const whoamiText = document.getElementById("memoryModalWhoamiText");
+  const loginForm = document.getElementById("memoryModalLoginForm");
+  const uploadForm = document.getElementById("memoryModalUploadForm");
+  const submitBtn = document.getElementById("memoryModalSubmit");
+  const logoutBtn = document.getElementById("memoryModalLogout");
+  const photosInput = document.getElementById("memoryModalPhotos");
+  const preview = document.getElementById("memoryModalPreview");
+
+  function showBanner(message, type) {
+    banner.textContent = message;
+    banner.className = `memory-modal-banner ${type}`;
+  }
+  function clearBanner() {
+    banner.textContent = "";
+    banner.className = "memory-modal-banner";
+  }
+
+  async function api(path, options) {
+    let res;
+    try {
+      res = await fetch(BACKEND_URL + path, { credentials: "include", ...options });
+    } catch {
+      throw new Error("Kon de server niet bereiken. Check je internetverbinding en probeer opnieuw.");
+    }
+    let data = {};
+    try {
+      data = await res.json();
+    } catch {
+      // non-JSON response — fall through with empty data
+    }
+    if (!res.ok) throw new Error(data.error || `Er ging iets mis (${res.status}).`);
+    return data;
+  }
+
+  function showLoggedIn(username) {
+    loginForm.hidden = true;
+    uploadForm.hidden = false;
+    whoami.hidden = false;
+    whoamiText.textContent = `ingelogd als ${username}`;
+    const author = AUTHORS[username];
+    if (author) {
+      whoamiAvatar.src = author.avatar;
+      whoamiAvatar.alt = username;
+      whoamiAvatar.hidden = false;
+    } else {
+      whoamiAvatar.hidden = true;
+    }
+  }
+  function showLoggedOut() {
+    loginForm.hidden = false;
+    uploadForm.hidden = true;
+    whoami.hidden = true;
+  }
+
+  async function checkSession() {
+    try {
+      const { user } = await api("/api/me");
+      if (user) showLoggedIn(user);
+      else showLoggedOut();
+    } catch {
+      showLoggedOut();
+    }
+  }
+
+  function openModal() {
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+    clearBanner();
+    checkSession();
+  }
+  function closeModal() {
+    modal.hidden = true;
+    document.body.classList.remove("modal-open");
+  }
+
+  if (adminGear) {
+    adminGear.addEventListener("click", (e) => {
+      e.preventDefault();
+      openModal();
+    });
+  }
+  if (backdrop) backdrop.addEventListener("click", closeModal);
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !modal.hidden) closeModal();
+  });
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearBanner();
+    const username = document.getElementById("memoryModalUsername").value.trim();
+    const password = document.getElementById("memoryModalPassword").value;
+    try {
+      const data = await api("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      showLoggedIn(data.username);
+    } catch (err) {
+      showBanner(err.message, "error");
+    }
+  });
+
+  logoutBtn.addEventListener("click", async () => {
+    clearBanner();
+    try {
+      await api("/api/logout", { method: "POST" });
+    } catch {
+      // logging out regardless
+    }
+    showLoggedOut();
+  });
+
+  photosInput.addEventListener("change", () => {
+    preview.innerHTML = "";
+    Array.from(photosInput.files).forEach((file) => {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.addEventListener("load", () => URL.revokeObjectURL(img.src));
+      preview.appendChild(img);
+    });
+  });
+
+  uploadForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearBanner();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Bezig...";
+
+    try {
+      const data = await api("/api/memories", { method: "POST", body: new FormData(uploadForm) });
+      if (!data.dryRun) {
+        const item = insertMemoryIntoTimeline(data.memory);
+        if (item) {
+          item.scrollIntoView({ behavior: "smooth", block: "center" });
+          const rect = item.getBoundingClientRect();
+          burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 160);
+        }
+      }
+      showBanner("Toegevoegd! Ze staat er meteen bij op de site.", "success");
+      uploadForm.reset();
+      preview.innerHTML = "";
+      setTimeout(closeModal, 1400);
+    } catch (err) {
+      showBanner(err.message, "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Toevoegen";
+    }
+  });
 })();

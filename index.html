@@ -287,6 +287,51 @@
   <p>gemaakt met 💗 speciaal voor jou</p>
 </footer>
 
+<!-- ===================== ADD MEMORY MODAL (opens from the ⚙️ on memory lane) ===================== -->
+<!-- Deliberately a sibling of <footer>, not nested inside memory-lane-section:
+     that section gets a CSS transform during its reveal animation, which
+     would break this modal's position:fixed if it were a descendant. -->
+<div id="memoryModal" class="memory-modal" hidden>
+  <div class="memory-modal-backdrop" id="memoryModalBackdrop"></div>
+  <div class="card memory-modal-card" role="dialog" aria-modal="true" aria-label="Herinnering toevoegen">
+    <button type="button" class="memory-modal-close" id="memoryModalClose" aria-label="Sluiten">&times;</button>
+    <h2 class="memory-modal-title">herinnering toevoegen 💗</h2>
+
+    <div id="memoryModalWhoami" class="memory-modal-whoami" hidden>
+      <img id="memoryModalAvatar" src="" alt="" />
+      <span id="memoryModalWhoamiText"></span>
+    </div>
+    <div id="memoryModalBanner" class="memory-modal-banner"></div>
+
+    <form id="memoryModalLoginForm" class="memory-modal-form">
+      <label for="memoryModalUsername">Gebruikersnaam</label>
+      <input type="text" id="memoryModalUsername" autocomplete="username" required />
+      <label for="memoryModalPassword">Wachtwoord</label>
+      <input type="password" id="memoryModalPassword" autocomplete="current-password" required />
+      <button type="submit" class="btn-primary">Inloggen</button>
+    </form>
+
+    <form id="memoryModalUploadForm" class="memory-modal-form" hidden>
+      <label for="memoryModalTitle">Titel / tekst bij dit moment</label>
+      <input type="text" id="memoryModalTitle" name="title" required maxlength="300" placeholder="Typ hier..." />
+
+      <label for="memoryModalPlace">Plaats</label>
+      <input type="text" id="memoryModalPlace" name="place" required maxlength="80" placeholder="bv. Gent" />
+
+      <label for="memoryModalDate">Datum (dd/mm)</label>
+      <input type="text" id="memoryModalDate" name="date" required pattern="\d{1,2}/\d{1,2}" placeholder="bv. 05/08" />
+      <p class="memory-modal-hint">Bepaalt automatisch waar dit op de tijdlijn komt te staan.</p>
+
+      <label for="memoryModalPhotos">Foto's (max 6, max 8MB per foto)</label>
+      <input type="file" id="memoryModalPhotos" name="photos" accept="image/*" multiple required />
+      <div id="memoryModalPreview" class="memory-modal-preview"></div>
+
+      <button type="submit" id="memoryModalSubmit" class="btn-primary">Toevoegen</button>
+      <button type="button" id="memoryModalLogout" class="btn-secondary">Uitloggen</button>
+    </form>
+  </div>
+</div>
+
 <script src="js/script.js"></script>
 </body>
 </html>

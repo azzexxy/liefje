@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex, nofollow" />
 <title>herinnering toevoegen</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet" />
 <style>
@@ -42,10 +45,9 @@
     font-family: "Dancing Script", cursive;
     color: var(--pink-deep);
     font-size: 2rem;
-    margin: 0 0 4px;
+    margin: 0 0 22px;
     text-align: center;
   }
-  p.sub { text-align: center; margin: 0 0 22px; opacity: 0.8; font-size: 0.9rem; }
   label { display: block; font-weight: 600; margin: 14px 0 6px; font-size: 0.9rem; }
   input[type="text"], input[type="password"], input[type="file"] {
     width: 100%;
@@ -55,6 +57,43 @@
     font-family: inherit;
     font-size: 1rem;
     background: var(--white);
+  }
+  input[type="file"]::file-selector-button {
+    font-family: "Quicksand", sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #fff;
+    background: linear-gradient(135deg, var(--pink-400), var(--pink-deep));
+    border: none;
+    border-radius: 999px;
+    padding: 8px 16px;
+    margin-right: 12px;
+    cursor: pointer;
+  }
+  input[type="file"]::-webkit-file-upload-button {
+    font-family: "Quicksand", sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #fff;
+    background: linear-gradient(135deg, var(--pink-400), var(--pink-deep));
+    border: none;
+    border-radius: 999px;
+    padding: 8px 16px;
+    margin-right: 12px;
+    cursor: pointer;
+  }
+  .preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .preview img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid var(--pink-200);
   }
   button {
     width: 100%;
@@ -102,7 +141,6 @@
 <body>
   <div class="card">
     <h1>herinnering toevoegen 💗</h1>
-    <p class="sub">enkel voor ons tweetjes</p>
 
     <div id="whoami" hidden>
       <img id="whoamiAvatar" src="" alt="" />
@@ -131,6 +169,7 @@
 
       <label for="photos">Foto's (max 6, max 8MB per foto)</label>
       <input type="file" id="photos" name="photos" accept="image/*" multiple required />
+      <div id="photoPreview" class="preview"></div>
 
       <button type="submit" id="submitBtn">Toevoegen</button>
       <button type="button" class="secondary" id="logoutBtn">Uitloggen</button>

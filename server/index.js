@@ -1,6 +1,7 @@
 require("dotenv").config();
 const path = require("path");
 const express = require("express");
+const cors = require("cors");
 const cookieSession = require("cookie-session");
 
 const authRoutes = require("./src/routes/auth");
@@ -15,8 +16,19 @@ if (!process.env.USERS) {
   console.warn("WARNING: USERS is not set — nobody will be able to log in.");
 }
 
+const isProd = process.env.NODE_ENV === "production";
 const app = express();
 app.set("trust proxy", 1);
+
+// Lets the public site (a different origin — GitHub Pages) call this API
+// with cookies attached, for the inline "add memory" modal. Locked to one
+// specific origin (never a wildcard) since credentials are involved.
+app.use(
+  cors({
+    origin: process.env.PUBLIC_SITE_ORIGIN || "https://azzexxy.github.io",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -28,8 +40,12 @@ app.use(
     // Long-lived on purpose: this is a private 2-person tool, so once logged
     // in on a device it should just stay logged in rather than asking again.
     maxAge: 365 * 24 * 60 * 60 * 1000,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    // Cross-site cookies (the public site calling this API from a different
+    // origin) require SameSite=None, which browsers only honor over HTTPS —
+    // hence tying it to production. Locally over plain http, Lax keeps the
+    // same-origin admin.html and curl/test flows working as before.
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
   })
 );
 

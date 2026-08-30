@@ -5,6 +5,8 @@ const whoamiText = document.getElementById("whoamiText");
 const loginForm = document.getElementById("loginForm");
 const memoryForm = document.getElementById("memoryForm");
 const submitBtn = document.getElementById("submitBtn");
+const photosInput = document.getElementById("photos");
+const photoPreview = document.getElementById("photoPreview");
 
 const AVATARS = { Lothar: "avatars/lothar.png", Charlotte: "avatars/charlotte.png" };
 
@@ -95,6 +97,16 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   showLoggedOut();
 });
 
+photosInput.addEventListener("change", () => {
+  photoPreview.innerHTML = "";
+  Array.from(photosInput.files).forEach((file) => {
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    img.addEventListener("load", () => URL.revokeObjectURL(img.src));
+    photoPreview.appendChild(img);
+  });
+});
+
 memoryForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearBanner();
@@ -108,6 +120,7 @@ memoryForm.addEventListener("submit", async (e) => {
     const note = data.dryRun ? " (TEST-modus: niet echt opgeslagen op GitHub)" : "";
     showBanner(`Toegevoegd! Ze staat er zo bij op de site.${note}`, "success");
     memoryForm.reset();
+    photoPreview.innerHTML = "";
   } catch (err) {
     showBanner(err.message, "error");
   } finally {

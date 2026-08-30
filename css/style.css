@@ -32,6 +32,10 @@ body {
   position: relative;
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
 #hearts-bg {
   position: fixed;
   inset: 0;
@@ -822,4 +826,176 @@ body {
   .card {
     padding: 30px 22px;
   }
+}
+
+/* ============ Inline "add memory" modal (opens from the ⚙️ on memory lane) ============ */
+.memory-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* The modal (and its whoami row) set their own `display` for when they're
+   shown, which is equal-or-higher specificity than the browser's built-in
+   `[hidden] { display: none }` rule and can win the cascade regardless of
+   the hidden attribute — so anything using `hidden` needs this to actually
+   stay hidden. !important is deliberate here: hidden must always win. */
+[hidden] {
+  display: none !important;
+}
+
+.memory-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(107, 58, 77, 0.45);
+}
+
+.memory-modal-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 2px dashed var(--pink-200);
+  text-align: left;
+  padding: 36px 28px;
+}
+
+.memory-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--pink-500);
+  cursor: pointer;
+}
+
+.memory-modal-title {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  color: var(--pink-deep);
+  text-align: center;
+  margin: 0 0 20px;
+}
+
+.memory-modal-whoami {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  opacity: 0.85;
+}
+
+.memory-modal-whoami img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--pink-200);
+}
+
+.memory-modal-form label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin: 14px 0 6px;
+}
+
+.memory-modal-form input[type="text"],
+.memory-modal-form input[type="password"],
+.memory-modal-form input[type="file"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--pink-200);
+  font-family: inherit;
+  font-size: 1rem;
+  background: var(--pink-50);
+}
+
+/* Kept as two separate rules on purpose — a browser that doesn't recognize
+   one of these two pseudo-elements would drop the entire rule if they were
+   combined with a comma, not just that one selector. */
+.memory-modal-form input[type="file"]::file-selector-button {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: white;
+  background: linear-gradient(135deg, var(--pink-400), var(--pink-deep));
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+.memory-modal-form input[type="file"]::-webkit-file-upload-button {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: white;
+  background: linear-gradient(135deg, var(--pink-400), var(--pink-deep));
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+.memory-modal-hint {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin: 4px 0 0;
+}
+
+.memory-modal-form .btn-primary,
+.memory-modal-form .btn-secondary {
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px;
+  font-size: 0.95rem;
+}
+
+.memory-modal-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.memory-modal-preview img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid var(--pink-200);
+}
+
+.memory-modal-banner {
+  display: none;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.memory-modal-banner.error {
+  display: block;
+  background: #ffe3e3;
+  color: #a3302f;
+}
+
+.memory-modal-banner.success {
+  display: block;
+  background: #e3f9ea;
+  color: #226a3f;
 }
