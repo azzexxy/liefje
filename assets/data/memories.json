@@ -4,48 +4,78 @@
     "title": "Gezellig wandelingetje door de daknamse bossen",
     "place": "Daknam",
     "date": "22/05",
-    "photos": ["assets/photos/surprise/daknam-1.jpg"],
-    "photoAlts": ["Avondwandeling in Daknam"]
+    "photos": [
+      "assets/photos/surprise/daknam-1.jpg"
+    ],
+    "photoAlts": [
+      "Avondwandeling in Daknam"
+    ]
   },
   {
     "id": "zele",
     "title": "de grote ontmoeting met mijn competitie ;)",
     "place": "Zele",
     "date": "05/06",
-    "photos": ["assets/photos/surprise/zele-1.jpg"],
-    "photoAlts": ["Samen met de hond in Zele"]
+    "photos": [
+      "assets/photos/surprise/zele-1.jpg"
+    ],
+    "photoAlts": [
+      "Samen met de hond in Zele"
+    ]
   },
   {
     "id": "gent",
-    "title": "de surprise cinemadate was zo gezellig met jou & je was zo schattig toen cinnamon girl begon te spelen tijdens de film en direct naar mij keek :)",
+    "title": "de surprise cinemadate was zo gezellig & je was zo schattig toen cinnamon girl begon te spelen tijdens de film en direct naar mij keek :)",
     "place": "Gent",
     "date": "28/06",
-    "photos": ["assets/photos/surprise/gent-1.jpg", "assets/photos/surprise/gent-2.jpg"],
-    "photoAlts": ["IJsje in Gent", "Openluchtbioscoop in Gent"]
+    "photos": [
+      "assets/photos/surprise/gent-1.jpg",
+      "assets/photos/surprise/gent-2.jpg"
+    ],
+    "photoAlts": [
+      "IJsje in Gent",
+      "Openluchtbioscoop in Gent"
+    ]
   },
   {
     "id": "knokke",
     "title": "Ons weekendje Knokke was wel echt een van de hoogtepunten van de afgelopen maanden, al zeker onze picnicdate op het strand :))",
     "place": "Knokke",
     "date": "03/07",
-    "photos": ["assets/photos/surprise/knokke-1.jpg", "assets/photos/surprise/knokke-2.jpg"],
-    "photoAlts": ["Zonsondergang aan het strand in Knokke", "Samen op de foto in Knokke"]
+    "photos": [
+      "assets/photos/surprise/knokke-1.jpg",
+      "assets/photos/surprise/knokke-2.jpg"
+    ],
+    "photoAlts": [
+      "Zonsondergang aan het strand in Knokke",
+      "Samen op de foto in Knokke"
+    ]
   },
   {
     "id": "mundaka",
     "title": "onze trip door Spanje met je familie, ik had me oprecht geen betere en leukere 1ste reis met je familie kunnen wensen :)",
     "place": "Mundaka, Spanje",
     "date": "13/07",
-    "photos": ["assets/photos/surprise/mundaka-1.jpg", "assets/photos/surprise/mundaka-2.jpg"],
-    "photoAlts": ["Samen aan zee in Mundaka", "Uitzicht over de baai van Mundaka"]
+    "photos": [
+      "assets/photos/surprise/mundaka-1.jpg",
+      "assets/photos/surprise/mundaka-2.jpg"
+    ],
+    "photoAlts": [
+      "Samen aan zee in Mundaka",
+      "Uitzicht over de baai van Mundaka"
+    ]
   },
   {
     "id": "sopela",
     "title": "dagje aan het strand met alle naakte mensen waar ik dan toch eindelijk misschien beseft heb dat mijn prinses Sofia toch nog meevalt waarna we lekker gegeten hebben en een insane schattige foto gemaakt hebben met iedereen ;)",
     "place": "Sopela Beach, Spanje",
     "date": "14/07",
-    "photos": ["assets/photos/surprise/sopela-1.jpg"],
-    "photoAlts": ["Groepsfoto bij zonsondergang op Sopela Beach"]
+    "photos": [
+      "assets/photos/surprise/sopela-1.jpg"
+    ],
+    "photoAlts": [
+      "Groepsfoto bij zonsondergang op Sopela Beach"
+    ]
   },
   {
     "id": "guggenheim",
@@ -70,8 +100,14 @@
     "title": "gezellig Biarritz & La Rochelle ontdekken met de familie en een leuk wandelingetje maken tot aan de kleine haven in La Rochelle waar we een heel gesprek hebben gehad over de namen van onze latere hond & kat :)",
     "place": "Biarritz & La Rochelle",
     "date": "18/07",
-    "photos": ["assets/photos/surprise/biarritz-1.jpg", "assets/photos/surprise/biarritz-2.jpg"],
-    "photoAlts": ["Samen in de haven van Biarritz", "Kusje met zicht op zee in Biarritz"]
+    "photos": [
+      "assets/photos/surprise/biarritz-1.jpg",
+      "assets/photos/surprise/biarritz-2.jpg"
+    ],
+    "photoAlts": [
+      "Samen in de haven van Biarritz",
+      "Kusje met zicht op zee in Biarritz"
+    ]
   },
   {
     "id": "giverny",
@@ -88,5 +124,16 @@
       "Samen onder de bomen in Giverny",
       "Bij de waterlelies in Monet's tuin"
     ]
+  },
+  {
+    "id": "als-afsluiter-van-de-vakantie-nog-samen--1788061749974",
+    "title": "als afsluiter van de vakantie nog samen naar de Lokerse feesten waar k kennis gemaakt heb met het hele vier emmershof team & eerlijk is eerlijk t was wel echt een vibe :))",
+    "place": "Lokerse Feesten",
+    "date": "29/08",
+    "photos": [
+      "https://res.cloudinary.com/pl6n2ggy/image/upload/v1788061751/liefje-memories/als-afsluiter-van-de-vakantie-nog-samen--1788061749974-0.jpg"
+    ],
+    "addedBy": "Lothar",
+    "createdAt": "2026-08-30T03:49:11.644Z"
   }
 ]
