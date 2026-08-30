@@ -63,8 +63,14 @@ opgeslagen op GitHub)" and nothing is actually written anywhere.
      `cloudinary://<api_key>:<api_secret>@<cloud_name>`.
    - Leave `DRY_RUN=false` (already set by `render.yaml`) so it actually
      saves for real.
+   - `PUBLIC_SITE_ORIGIN` — the origin (scheme + host, no path) the public
+     site is served from, e.g. `https://azzexxy.github.io`. The inline
+     "add memory" tools on that site call this API cross-origin, and this
+     is the only origin CORS will accept requests from.
 4. Deploy. Once it's live, open `https://<your-service>.onrender.com/admin.html`
-   — that's the private link only the two of you should have.
+   — a private fallback login page (same login, but as a full standalone
+   page) if the inline tools on the public site aren't reachable for
+   whatever reason. The normal way in is the ⚙️ on the site itself.
 
 Render's free tier spins the service down after inactivity, so the first
 request after a while takes a few extra seconds to wake up — that's normal.
@@ -87,7 +93,13 @@ error or a silent hang:
 
 - Only 2 users exist, defined by you via the `USERS` env var — there's no
   public sign-up.
-- Sessions are a signed cookie (`SESSION_SECRET`); nothing is stored server-side.
+- Two auth mechanisms, both signed with `SESSION_SECRET`, nothing stored
+  server-side: a session cookie for `admin.html` (same-origin), and a bearer
+  token (sent as `Authorization: Bearer ...`, stored in the browser's
+  localStorage) for the inline tools on the public site. The token exists
+  because Safari (and Firefox) block cross-site cookies by default even
+  with `SameSite=None; Secure` set correctly — a bearer token isn't a
+  cookie, so none of that applies to it.
 - The GitHub token should be scoped to *only* this repository with *only*
   Contents read/write — never use a token with broader access.
 - `.env` is gitignored — never commit real secrets. Only `.env.example` (with

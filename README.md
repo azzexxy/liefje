@@ -21,19 +21,30 @@ throughout.
 3. **The personal note** — leads into the memory lane (appears together
    with it, once the candles are out). Edit the message in the `note-text`
    card to whatever you want it to say.
-4. **The memory lane** — a timeline of real events in chronological order
-   (place + date + photo(s) + title): Daknam (22/05), Zele (05/06), Gent
-   (28/06), Knokke (03/07), Mundaka (13/07), Sopela Beach (14/07),
-   Guggenheim Bilbao (17/07), Biarritz & La Rochelle (18/07), and Monet's
-   Garden in Giverny (20/07). An event with more than one photo wraps its
-   `<figure>`s in a `.timeline-photo-group` so they stack together on one
-   side. To add a new event, copy a whole `.timeline-item` block (see the
-   HTML comment right above the timeline for the exact steps: alternate
-   `side-left`/`side-right`, drop the photo(s) in `assets/photos/surprise/`,
-   and update the place/date spans in `.timeline-date`). Any entries in
-   `assets/data/memories.json` are appended automatically after the ones
-   above (same styling) — that's what the live "add a memory" tool below
-   writes to, so new memories don't need a manual HTML edit at all.
+4. **The memory lane** — a timeline of real events in chronological order:
+   Daknam (22/05), Zele (05/06), Gent (28/06), Knokke (03/07), Mundaka
+   (13/07), Sopela Beach (14/07), Guggenheim Bilbao (17/07), Biarritz & La
+   Rochelle (18/07), and Monet's Garden in Giverny (20/07). Every event —
+   these included — lives entirely in `assets/data/memories.json`, not in
+   `index.html`; `js/script.js` fetches it, builds the timeline, sorts every
+   entry by date, and recomputes left/right alternation automatically, so
+   an event slots into the right spot regardless of where it's added from.
+   Each entry looks like:
+   ```json
+   {
+     "id": "gent",
+     "title": "de surprise cinemadate was zo gezellig met jou & ...",
+     "place": "Gent",
+     "date": "28/06",
+     "photos": ["assets/photos/surprise/gent-1.jpg", "assets/photos/surprise/gent-2.jpg"],
+     "photoAlts": ["IJsje in Gent", "Openluchtbioscoop in Gent"]
+   }
+   ```
+   `photos` with more than one entry automatically stack together on one
+   side; `photoAlts` is optional (falls back to using the title as alt text
+   for every photo). Add/edit/remove events either through the ⚙️ tools on
+   the live site (see below), or by editing this JSON file directly and
+   pushing.
 5. **Scattered childhood photos** — 3 childhood photos are tucked in as
    small "POV: me when ..." stickers at different points down the page,
    each already using a real photo (`assets/photos/surprise/baby1.jpg`–
@@ -41,11 +52,12 @@ throughout.
 
 There's no PIN/passcode on the site — anyone with the link can open it.
 
-6. **Adding memories live** — see [`server/README.md`](server/README.md) for the
-   optional login-gated tool that lets the two of you add new memory-lane
-   entries (photos + caption) from your phones, which get committed straight
-   to this repo. It's a separate small backend, not part of the static site
-   above, and it's not linked from the site itself.
+6. **Adding memories live** — a small ⚙️ at the top of the memory lane
+   section opens a login popup (accounts are set up in the backend, see
+   [`server/README.md`](server/README.md)); once logged in, a permanent
+   "add a memory" card at the end of the timeline lets either of you fill
+   in a photo, place, date and description and have it committed straight
+   to this repo, landing in its correct chronological spot immediately.
 
 ## Publish it with GitHub Pages
 

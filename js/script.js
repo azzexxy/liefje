@@ -425,10 +425,12 @@ function buildTimelineItem(memory) {
   const item = document.createElement("div");
   item.className = "timeline-item";
   item.dataset.sortKey = String(dateSortKey(memory.date));
+  if (memory.id) item.dataset.memoryId = memory.id;
 
   const photoWrap = document.createElement("div");
   photoWrap.className = "timeline-photo";
   const photos = Array.isArray(memory.photos) ? memory.photos.filter(Boolean) : [];
+  const photoAlts = Array.isArray(memory.photoAlts) ? memory.photoAlts : [];
   const isGroup = photos.length > 1;
   const photoContainer = isGroup ? document.createElement("div") : photoWrap;
   if (isGroup) photoContainer.className = "timeline-photo-group";
@@ -437,7 +439,7 @@ function buildTimelineItem(memory) {
     figure.className = `polaroid ${ROT_CLASSES[i % ROT_CLASSES.length]}`;
     const img = document.createElement("img");
     img.src = src;
-    img.alt = memory.title || "Herinnering";
+    img.alt = photoAlts[i] || memory.title || "Herinnering";
     img.addEventListener("error", () => figure.classList.add("img-missing"));
     figure.appendChild(img);
     photoContainer.appendChild(figure);
@@ -490,13 +492,6 @@ function buildTimelineItem(memory) {
 // selector below via :not(.timeline-add-card).
 const REAL_TIMELINE_ITEM = ".timeline-item:not(.timeline-add-card)";
 
-function tagStaticTimelineItems() {
-  if (!timelineEl) return;
-  timelineEl.querySelectorAll(REAL_TIMELINE_ITEM).forEach((item) => {
-    if (item.dataset.sortKey === undefined) item.dataset.sortKey = String(dateSortKey(item.dataset.date));
-  });
-}
-
 // Keeps the add-card and the "more to come" badge pinned as the last two
 // children, continuing the left/right zigzag from wherever the real items
 // left off — called after any insert/sort so they never end up stranded
@@ -536,10 +531,9 @@ const timelineRevealObserver = new IntersectionObserver(
 );
 
 // Builds, inserts, sorts, and reveal-observes one memory — used both for
-// memories.json on load and for a memory just submitted through the modal.
+// memories.json on load and for a memory just submitted through the add-card.
 function insertMemoryIntoTimeline(memory) {
   if (!timelineEl || !timelineContinueBadge) return null;
-  tagStaticTimelineItems();
   const item = buildTimelineItem(memory);
   timelineEl.insertBefore(item, timelineContinueBadge);
   reorderTimelineByDate();
@@ -547,17 +541,15 @@ function insertMemoryIntoTimeline(memory) {
   return item;
 }
 
-// ============ Dynamically added memories (posted through the admin panel) ============
-// Reads assets/data/memories.json on load. If the file is empty/missing/
-// unreachable this quietly does nothing, so the static timeline still works.
-(function loadDynamicMemories() {
+// ============ Memories ============
+// Every event (the original ones included) lives in assets/data/memories.json,
+// not in this HTML — fetched and rendered here. If the file is empty/missing/
+// unreachable, the page still works, it's just an empty timeline.
+(function loadMemories() {
   if (!timelineEl || !timelineContinueBadge) return;
-  tagStaticTimelineItems();
   // Gives the add-card its side class and correct position immediately,
-  // even if memories.json turns out empty (reorderTimelineByDate below
-  // would otherwise be the only thing setting it, and that's skipped when
-  // there's nothing dynamic to insert).
-  pinTimelineFooter(timelineEl.querySelectorAll(REAL_TIMELINE_ITEM).length);
+  // even before the fetch below resolves (or if it fails).
+  pinTimelineFooter(0);
 
   fetch("assets/data/memories.json", { cache: "no-store" })
     .then((res) => (res.ok ? res.json() : []))
@@ -566,7 +558,7 @@ function insertMemoryIntoTimeline(memory) {
       memories.forEach((memory) => insertMemoryIntoTimeline(memory));
     })
     .catch(() => {
-      // no dynamic memories yet, or offline — the static timeline above still works fine
+      // couldn't load memories.json — the page still works, just with an empty timeline
     });
 })();
 

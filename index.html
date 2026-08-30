@@ -67,17 +67,14 @@
 
 <!-- ===================== MEMORY LANE TIMELINE ===================== -->
 <!--
-  Each event is one .timeline-item. To add the next event, copy a whole
-  block below (including its closing </div>) and:
-    - set data-date on the item itself (dd/mm) — js/script.js sorts every
-      item (this one plus anything from assets/data/memories.json) by that
-      date and recomputes side-left/side-right automatically, so it slots
-      into the right spot in the timeline regardless of where you paste it
-    - swap the photo src (drop new photos into assets/photos/surprise/)
-    - update the place (first <span>) and date (<span class="timeline-day">,
-      European d/m format) in .timeline-date — keep it identical to data-date
-    - write the title (<h3>) — optionally add a <p> after it for a short
-      blurb, matching earlier events, if you want more text per event
+  Every event lives in assets/data/memories.json (not here) — js/script.js
+  fetches it, builds one .timeline-item per entry, sorts them all by date,
+  and recomputes side-left/side-right automatically. Add/edit/remove events
+  either through the ⚙️ tools on the live site, or by editing that JSON file
+  directly: {id, title, place, date (dd/mm), photos: [...], photoAlts: [...]}
+  — photoAlts is optional, falls back to using the title as alt text.
+  The only thing still in this HTML file is the always-last "add a memory"
+  placeholder card right before the timeline closes.
 -->
 <section class="section memory-lane-section locked-content-final" id="memory-lane">
   <!-- Points at the private admin panel where memories get added. Not meant to
@@ -111,162 +108,6 @@
   <div class="timeline">
     <div class="timeline-track"></div>
     <div class="timeline-fill"><span class="timeline-runner">💗</span></div>
-
-    <div class="timeline-item side-left" data-date="22/05">
-      <div class="timeline-photo">
-        <figure class="polaroid rot-1">
-          <img src="assets/photos/surprise/daknam-1.jpg" alt="Avondwandeling in Daknam" onerror="this.parentElement.classList.add('img-missing')" />
-        </figure>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <p class="timeline-date"><span>📍 Daknam</span><span class="timeline-day">22/05</span></p>
-        <h3>Gezellig wandelingetje door de daknamse bossen</h3>
-      </div>
-    </div>
-
-    <div class="timeline-item side-right" data-date="05/06">
-      <div class="timeline-photo">
-        <figure class="polaroid rot-2">
-          <img src="assets/photos/surprise/zele-1.jpg" alt="Samen met de hond in Zele" onerror="this.parentElement.classList.add('img-missing')" />
-        </figure>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <p class="timeline-date"><span>📍 Zele</span><span class="timeline-day">05/06</span></p>
-        <h3>de grote ontmoeting met mijn competitie ;)</h3>
-      </div>
-    </div>
-
-    <div class="timeline-item side-left" data-date="28/06">
-      <div class="timeline-photo">
-        <div class="timeline-photo-group">
-          <figure class="polaroid rot-3">
-            <img src="assets/photos/surprise/gent-1.jpg" alt="IJsje in Gent" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-          <figure class="polaroid rot-2">
-            <img src="assets/photos/surprise/gent-2.jpg" alt="Openluchtbioscoop in Gent" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-        </div>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <p class="timeline-date"><span>📍 Gent</span><span class="timeline-day">28/06</span></p>
-        <h3>de surprise cinemadate was zo gezellig met jou & je was zo schattig toen cinnamon girl begon te spelen tijdens de film en direct naar mij keek :)</h3>
-      </div>
-    </div>
-
-    <div class="timeline-item side-right" data-date="03/07">
-      <div class="timeline-photo">
-        <div class="timeline-photo-group">
-          <figure class="polaroid rot-1">
-            <img src="assets/photos/surprise/knokke-1.jpg" alt="Zonsondergang aan het strand in Knokke" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-          <figure class="polaroid rot-4">
-            <img src="assets/photos/surprise/knokke-2.jpg" alt="Samen op de foto in Knokke" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-        </div>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <p class="timeline-date"><span>📍 Knokke</span><span class="timeline-day">03/07</span></p>
-        <h3>Ons weekendje Knokke was wel echt een van de hoogtepunten van de afgelopen maanden, al zeker onze picnicdate op het strand :))</h3>
-      </div>
-    </div>
-
-    <div class="timeline-item side-left" data-date="13/07">
-      <div class="timeline-photo">
-        <div class="timeline-photo-group">
-          <figure class="polaroid rot-2">
-            <img src="assets/photos/surprise/mundaka-1.jpg" alt="Samen aan zee in Mundaka" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-          <figure class="polaroid rot-3">
-            <img src="assets/photos/surprise/mundaka-2.jpg" alt="Uitzicht over de baai van Mundaka" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-        </div>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <p class="timeline-date"><span>📍 Mundaka, Spanje</span><span class="timeline-day">13/07</span></p>
-        <h3>onze trip door Spanje met je familie, ik had me oprecht geen betere en leukere 1ste reis met je familie kunnen wensen :)</h3>
-      </div>
-    </div>
-
-    <div class="timeline-item side-right" data-date="14/07">
-      <div class="timeline-photo">
-        <figure class="polaroid rot-1">
-          <img src="assets/photos/surprise/sopela-1.jpg" alt="Groepsfoto bij zonsondergang op Sopela Beach" onerror="this.parentElement.classList.add('img-missing')" />
-        </figure>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <p class="timeline-date"><span>📍 Sopela Beach, Spanje</span><span class="timeline-day">14/07</span></p>
-        <h3>dagje aan het strand met alle naakte mensen waar ik dan toch eindelijk misschien beseft heb dat mijn prinses Sofia toch nog meevalt waarna we lekker gegeten hebben en een insane schattige foto gemaakt hebben met iedereen ;)</h3>
-      </div>
-    </div>
-
-    <div class="timeline-item side-left" data-date="17/07">
-      <div class="timeline-photo">
-        <div class="timeline-photo-group">
-          <figure class="polaroid rot-3">
-            <img src="assets/photos/surprise/guggenheim-1.jpg" alt="Samen in het Guggenheim museum" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-          <figure class="polaroid rot-1">
-            <img src="assets/photos/surprise/guggenheim-2.jpg" alt="Bij een kunstwerk in het Guggenheim" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-          <figure class="polaroid rot-4">
-            <img src="assets/photos/surprise/guggenheim-3.jpg" alt="Bij een kunstwerk in het Guggenheim" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-          <figure class="polaroid rot-2">
-            <img src="assets/photos/surprise/guggenheim-4.jpg" alt="Bij een kunstwerk in het Guggenheim" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-        </div>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <p class="timeline-date"><span>📍 Guggenheim museum, Bilbao</span><span class="timeline-day">17/07</span></p>
-        <h3>de leuke uitstap naar het Guggenheim museum in Bilbao waar ik eigenlijk meer geïnteresseerd aan het zoeken was naar voetbalshirts & jou aan het bewonderen was dat de kunst daarbinnen... oepsss</h3>
-      </div>
-    </div>
-
-    <div class="timeline-item side-right" data-date="18/07">
-      <div class="timeline-photo">
-        <div class="timeline-photo-group">
-          <figure class="polaroid rot-4">
-            <img src="assets/photos/surprise/biarritz-1.jpg" alt="Samen in de haven van Biarritz" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-          <figure class="polaroid rot-1">
-            <img src="assets/photos/surprise/biarritz-2.jpg" alt="Kusje met zicht op zee in Biarritz" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-        </div>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <p class="timeline-date"><span>📍 Biarritz & La Rochelle</span><span class="timeline-day">18/07</span></p>
-        <h3>gezellig Biarritz & La Rochelle ontdekken met de familie en een leuk wandelingetje maken tot aan de kleine haven in La Rochelle waar we een heel gesprek hebben gehad over de namen van onze latere hond & kat :)</h3>
-      </div>
-    </div>
-
-    <div class="timeline-item side-left" data-date="20/07">
-      <div class="timeline-photo">
-        <div class="timeline-photo-group">
-          <figure class="polaroid rot-2">
-            <img src="assets/photos/surprise/giverny-1.jpg" alt="Op de Japanse brug in Monet's tuin" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-          <figure class="polaroid rot-3">
-            <img src="assets/photos/surprise/giverny-2.jpg" alt="Samen onder de bomen in Giverny" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-          <figure class="polaroid rot-1">
-            <img src="assets/photos/surprise/giverny-3.jpg" alt="Bij de waterlelies in Monet's tuin" onerror="this.parentElement.classList.add('img-missing')" />
-          </figure>
-        </div>
-      </div>
-      <div class="timeline-node"></div>
-      <div class="timeline-text">
-        <p class="timeline-date"><span>📍 Monet's tuin, Giverny</span><span class="timeline-day">20/07</span></p>
-        <h3>en als laatste of course de tuinen van Monet, insaneeeee mooi maar lowkey niets vergeleken met jou, dus ook hier heb ik voornamelijk jou bewonderd... :)</h3>
-      </div>
-    </div>
 
     <!-- Always-last placeholder "compose" card — js/script.js keeps it pinned
          to the end and recomputes its side. Filling it in and submitting
