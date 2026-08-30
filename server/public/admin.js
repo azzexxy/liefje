@@ -97,13 +97,30 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   showLoggedOut();
 });
 
+function buildPreviewThumb(file) {
+  const objectUrl = URL.createObjectURL(file);
+  const revoke = () => URL.revokeObjectURL(objectUrl);
+  let el;
+  if (file.type.startsWith("video/")) {
+    el = document.createElement("video");
+    el.muted = true;
+    el.autoplay = true;
+    el.loop = true;
+    el.playsInline = true;
+    // <video> has no "load" event (that's img-only) — "loadeddata" is its equivalent.
+    el.addEventListener("loadeddata", revoke);
+  } else {
+    el = document.createElement("img");
+    el.addEventListener("load", revoke);
+  }
+  el.src = objectUrl;
+  return el;
+}
+
 photosInput.addEventListener("change", () => {
   photoPreview.innerHTML = "";
   Array.from(photosInput.files).forEach((file) => {
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(file);
-    img.addEventListener("load", () => URL.revokeObjectURL(img.src));
-    photoPreview.appendChild(img);
+    photoPreview.appendChild(buildPreviewThumb(file));
   });
 });
 

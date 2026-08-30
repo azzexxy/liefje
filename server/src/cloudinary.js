@@ -17,7 +17,7 @@ function loadCloudinary() {
   }
 }
 
-function uploadPhoto(buffer, publicIdHint) {
+function uploadMedia(buffer, publicIdHint, resourceType) {
   return new Promise((resolve, reject) => {
     let cloudinary;
     try {
@@ -26,7 +26,7 @@ function uploadPhoto(buffer, publicIdHint) {
       return reject(err);
     }
     const stream = cloudinary.uploader.upload_stream(
-      { folder: "liefje-memories", public_id: publicIdHint, resource_type: "image" },
+      { folder: "liefje-memories", public_id: publicIdHint, resource_type: resourceType },
       (err, result) => {
         if (err) return reject(new CloudinaryError(err.message || "Cloudinary upload mislukt"));
         resolve(result.secure_url);
@@ -36,4 +36,7 @@ function uploadPhoto(buffer, publicIdHint) {
   });
 }
 
-module.exports = { uploadPhoto, CloudinaryError };
+const uploadPhoto = (buffer, publicIdHint) => uploadMedia(buffer, publicIdHint, "image");
+const uploadVideo = (buffer, publicIdHint) => uploadMedia(buffer, publicIdHint, "video");
+
+module.exports = { uploadPhoto, uploadVideo, CloudinaryError };

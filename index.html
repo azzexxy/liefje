@@ -4,9 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>happy bday liefje &lt;3</title>
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
-<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png" />
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=2" />
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png?v=2" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,8 +19,8 @@
 
 <!-- ===================== PUZZLE GATE (first thing she sees) ===================== -->
 <section class="section puzzle-section" id="puzzle-section">
-  <h2 class="section-title">eerst nog een klein puzzeltje 🙂<span class="heart-dot">♥</span></h2>
-  <p class="section-sub">Klik op twee stukjes om ze te wisselen!</p>
+  <h2 class="section-title" data-editable="puzzle-title">eerst nog een klein puzzeltje 🙂<span class="heart-dot">♥</span></h2>
+  <p class="section-sub" data-editable="puzzle-subtitle">Klik op twee stukjes om ze te wisselen!</p>
   <div class="puzzle-wrap">
     <!-- EDIT ME: vervang assets/photos/puzzle.jpg door de echte foto -->
     <div class="puzzle-board" id="puzzleBoard" data-image="assets/photos/puzzle.jpg"></div>
@@ -32,8 +32,8 @@
   <figure class="polaroid mini-polaroid rot-3">
     <img src="assets/photos/surprise/baby1.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
   </figure>
-  <p class="mini-throwback-caption">POV: me when ...</p>
-  <p class="mini-throwback-text">you say I'm your man :)</p>
+  <p class="mini-throwback-caption" data-editable="mini1-caption">POV: me when ...</p>
+  <p class="mini-throwback-text" data-editable="mini1-text">you say I'm your man :)</p>
 </div>
 
 <!-- canvas confetti burst -->
@@ -41,8 +41,8 @@
 
 <!-- ===================== 21 CANDLES ===================== -->
 <section class="section cake-reveal-section locked-content" id="cakeReveal">
-  <h2 class="section-title">maak een wensje... 21x! 🎂</h2>
-  <p class="section-sub">Blaas alle kaarsjes uit voor je verder mag naar onze herinneringen!</p>
+  <h2 class="section-title" data-editable="cake-title">maak een wensje... 21x! 🎂</h2>
+  <p class="section-sub" data-editable="cake-subtitle">Blaas alle kaarsjes uit voor je verder mag naar onze herinneringen!</p>
   <div class="big-cake-wrap">
     <div class="big-cake">
       <div class="candles-row" id="candlesRow"></div>
@@ -61,8 +61,8 @@
   <figure class="polaroid mini-polaroid rot-2">
     <img src="assets/photos/surprise/baby2.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
   </figure>
-  <p class="mini-throwback-caption">POV: me when ...</p>
-  <p class="mini-throwback-text">you mention "headscratchiessss" :)</p>
+  <p class="mini-throwback-caption" data-editable="mini2-caption">POV: me when ...</p>
+  <p class="mini-throwback-text" data-editable="mini2-text">you mention "headscratchiessss" :)</p>
 </div>
 
 <!-- ===================== MEMORY LANE TIMELINE ===================== -->
@@ -82,11 +82,11 @@
        (ADMIN_PANEL_URL) once the backend is deployed. -->
   <a id="adminGear" class="admin-gear" href="#" target="_blank" rel="noopener" title="Herinnering toevoegen" aria-label="Beheer">⚙️</a>
 
-  <h1 class="hero-title hero-title-subtle">Met liefde gemaakt voor mn future wife 💕</h1>
+  <h1 class="hero-title hero-title-subtle" data-editable="dedication">Met liefde gemaakt voor mn future wife 💕</h1>
 
   <div class="card note-card">
     <div class="quote-mark">“</div>
-    <p class="note-text">
+    <p class="note-text" data-editable="note-text">
       Hey liefje, ik wil starten met te zeggen hoe immens fier ik ben op jou & wat je al
       bereikt hebt op deze leeftijd. We zijn nog niet zo super lang samen maar 1 ding weet
       ik zeker & dat is dat ik de rest van mn leven met jou wil doorbrengen en dan heb ik
@@ -98,12 +98,12 @@
       ben 🙂 voor nu heb ik toch redelijk wat tijd & moeite in deze prachtige website
       gestoken, maar dat was het 1000% waard, ik hoop dat je m mooi vindt. &lt;3
     </p>
-    <p class="note-signature">xxx je liefje</p>
+    <p class="note-signature" data-editable="note-signature">xxx je liefje</p>
   </div>
 
   <p class="memory-lane-flourish">✦ ✦ ✦</p>
-  <h2 class="memory-lane-title">Let's take a trip<br />through memory lane</h2>
-  <p class="section-sub">Elk plekje hieronder is een onvergetelijk dagje samen met ons tweetjes, waar we naar gelang van tijd nog dingetjes aan kunnen toevoegen.</p>
+  <h2 class="memory-lane-title" data-editable="memory-lane-title">Let's take a trip<br />through memory lane</h2>
+  <p class="section-sub" data-editable="memory-lane-subtitle">Elk plekje hieronder is een onvergetelijk dagje samen met ons tweetjes, waar we naar gelang van tijd nog dingetjes aan kunnen toevoegen.</p>
 
   <div class="timeline">
     <div class="timeline-track"></div>
@@ -117,10 +117,11 @@
       <div class="timeline-photo">
         <label class="timeline-add-photo-slot" for="timelineAddPhotoInput">
           <span class="timeline-add-plus">+</span>
-          <span>foto's toevoegen</span>
+          <span>foto's / video's toevoegen</span>
         </label>
-        <input type="file" id="timelineAddPhotoInput" accept="image/*" multiple hidden />
+        <input type="file" id="timelineAddPhotoInput" accept="image/*,video/*" multiple hidden />
         <div class="timeline-add-preview" id="timelineAddPreview"></div>
+        <p class="timeline-add-video-hint">video's worden ingekort tot 3 sec</p>
       </div>
       <div class="timeline-node"></div>
       <div class="timeline-text">
@@ -138,7 +139,7 @@
 
     <!-- signals more memories are still to come, without needing a real item -->
     <div class="timeline-continue">
-      <span class="timeline-continue-badge">en nog veel leuke momentjes die komen</span>
+      <span class="timeline-continue-badge" data-editable="timeline-continue-text">en nog veel leuke momentjes die komen</span>
     </div>
   </div>
 </section>
@@ -149,10 +150,10 @@
     <figure class="polaroid mini-polaroid rot-1">
       <img src="assets/photos/surprise/baby3.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
     </figure>
-    <p class="mini-throwback-caption">POV: me when ...</p>
-    <p class="mini-throwback-text">you say you love me :)</p>
+    <p class="mini-throwback-caption" data-editable="mini3-caption">POV: me when ...</p>
+    <p class="mini-throwback-text" data-editable="mini3-text">you say you love me :)</p>
   </div>
-  <p>gemaakt met 💗 speciaal voor jou</p>
+  <p data-editable="footer-text">gemaakt met 💗 speciaal voor jou</p>
 </footer>
 
 <!-- ===================== ADD MEMORY MODAL (opens from the ⚙️ on memory lane) ===================== -->
@@ -208,11 +209,28 @@
       <label>Foto's</label>
       <div id="editMemoryPhotos" class="edit-memory-photos"></div>
       <label for="editMemoryNewPhotos">Foto's toevoegen</label>
-      <input type="file" id="editMemoryNewPhotos" accept="image/*" multiple />
+      <input type="file" id="editMemoryNewPhotos" accept="image/*,video/*" multiple />
       <div id="editMemoryNewPreview" class="timeline-add-preview"></div>
 
       <button type="submit" id="editMemorySave" class="btn-primary">Opslaan</button>
       <button type="button" id="editMemoryCancel" class="btn-secondary">Annuleren</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== EDIT TEXT MODAL (✏️ next to any editable text on the page) ===================== -->
+<div id="editTextModal" class="memory-modal" hidden>
+  <div class="memory-modal-backdrop" id="editTextBackdrop"></div>
+  <div class="card memory-modal-card" role="dialog" aria-modal="true" aria-label="Tekst bewerken">
+    <button type="button" class="memory-modal-close" id="editTextClose" aria-label="Sluiten">&times;</button>
+    <h2 class="memory-modal-title">tekst bewerken ✏️</h2>
+
+    <div id="editTextBanner" class="memory-modal-banner"></div>
+
+    <form id="editTextForm" class="memory-modal-form">
+      <textarea id="editTextValue" rows="5" required></textarea>
+      <button type="submit" id="editTextSave" class="btn-primary">Opslaan</button>
+      <button type="button" id="editTextCancel" class="btn-secondary">Annuleren</button>
     </form>
   </div>
 </div>

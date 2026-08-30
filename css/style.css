@@ -243,12 +243,34 @@ body.modal-open {
 .rot-3 { transform: rotate(-3deg); }
 .rot-4 { transform: rotate(2deg); }
 
-.polaroid img {
+.polaroid img,
+.polaroid video {
   width: 100%;
   height: 220px;
   object-fit: cover;
   display: block;
   background: var(--pink-100);
+}
+
+.polaroid.has-video {
+  position: relative;
+}
+
+.polaroid.has-video::after {
+  content: "▶";
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: white;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
 .polaroid.img-missing img {
@@ -1024,12 +1046,20 @@ body.modal-open {
   margin-top: 10px;
 }
 
-.timeline-add-preview img {
+.timeline-add-preview img,
+.timeline-add-preview video {
   width: 64px;
   height: 64px;
   object-fit: cover;
   border-radius: 10px;
   border: 2px solid var(--pink-200);
+}
+
+.timeline-add-video-hint {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  text-align: center;
+  margin: 6px 0 0;
 }
 
 .timeline-add-input {
@@ -1171,4 +1201,40 @@ body.modal-open {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ============ Editable site text (✏️ next to headings/paragraphs) ============ */
+.memory-modal-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--pink-200);
+  font-family: inherit;
+  font-size: 1rem;
+  background: var(--pink-50);
+  resize: vertical;
+}
+
+.text-edit-btn {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 0.65em;
+  opacity: 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  vertical-align: middle;
+  transition: opacity 0.2s ease;
+}
+
+[data-editable]:hover .text-edit-btn,
+.text-edit-btn:focus {
+  opacity: 1;
+}
+
+@media (max-width: 700px) {
+  /* No hover on touch devices — always show so they're reachable by tap. */
+  .text-edit-btn {
+    opacity: 0.55;
+  }
 }

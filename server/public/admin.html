@@ -88,7 +88,8 @@
     gap: 8px;
     margin-top: 10px;
   }
-  .preview img {
+  .preview img,
+  .preview video {
     width: 64px;
     height: 64px;
     object-fit: cover;
@@ -167,8 +168,8 @@
       <input type="text" id="date" name="date" required pattern="\d{1,2}/\d{1,2}" placeholder="bv. 05/08" />
       <p class="hint">Bepaalt automatisch waar dit op de tijdlijn komt te staan.</p>
 
-      <label for="photos">Foto's (max 6, max 8MB per foto)</label>
-      <input type="file" id="photos" name="photos" accept="image/*" multiple required />
+      <label for="photos">Foto's of video's (max 6) — video's worden automatisch ingekort tot 3 sec</label>
+      <input type="file" id="photos" name="photos" accept="image/*,video/*" multiple required />
       <div id="photoPreview" class="preview"></div>
 
       <button type="submit" id="submitBtn">Toevoegen</button>

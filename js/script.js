@@ -309,8 +309,6 @@ if (puzzleBoard) {
 
   if (solved) {
     puzzleBoard.classList.add("solved");
-    const msg = document.getElementById("puzzleMsg");
-    if (msg) msg.textContent = "Alweer opgelost! 💗";
     revealLockedInstant("locked-content");
   }
 }
@@ -340,8 +338,7 @@ if (candlesRow && blowBigBtn) {
   // Already blown out on a previous visit — show the cake already done
   // instead of making her blow them out again.
   if (bigCakeBlown) {
-    blowBigBtn.disabled = true;
-    blowBigBtn.textContent = "Al gedaan 💗";
+    blowBigBtn.hidden = true;
     if (bigCakeMsg) bigCakeMsg.textContent = "Wensjes al gedaan! welkom terug bij onze herinneringen... 💗";
     revealLockedInstant("locked-content-final");
   }
@@ -421,6 +418,34 @@ function dateSortKey(dateStr) {
   return parseInt(m[2], 10) * 100 + parseInt(m[1], 10);
 }
 
+// Cloudinary serves video under /video/upload/ regardless of extension;
+// local/static paths are told apart by their extension instead.
+function isVideoUrl(url) {
+  return /\/video\/upload\//.test(url) || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(url);
+}
+
+// Small preview thumbnail for a freshly-picked File, before it's uploaded —
+// used by the add-card and the edit modal alike.
+function buildPreviewThumb(file) {
+  const objectUrl = URL.createObjectURL(file);
+  const revoke = () => URL.revokeObjectURL(objectUrl);
+  let el;
+  if (file.type.startsWith("video/")) {
+    el = document.createElement("video");
+    el.muted = true;
+    el.autoplay = true;
+    el.loop = true;
+    el.playsInline = true;
+    // <video> has no "load" event (that's img-only) — "loadeddata" is its equivalent.
+    el.addEventListener("loadeddata", revoke);
+  } else {
+    el = document.createElement("img");
+    el.addEventListener("load", revoke);
+  }
+  el.src = objectUrl;
+  return el;
+}
+
 function buildTimelineItem(memory) {
   const item = document.createElement("div");
   item.className = "timeline-item";
@@ -437,11 +462,23 @@ function buildTimelineItem(memory) {
   photos.forEach((src, i) => {
     const figure = document.createElement("figure");
     figure.className = `polaroid ${ROT_CLASSES[i % ROT_CLASSES.length]}`;
-    const img = document.createElement("img");
-    img.src = src;
-    img.alt = photoAlts[i] || memory.title || "Herinnering";
-    img.addEventListener("error", () => figure.classList.add("img-missing"));
-    figure.appendChild(img);
+    let media;
+    if (isVideoUrl(src)) {
+      figure.classList.add("has-video");
+      media = document.createElement("video");
+      media.src = src;
+      media.muted = true;
+      media.autoplay = true;
+      media.loop = true;
+      media.playsInline = true;
+      media.controls = true;
+    } else {
+      media = document.createElement("img");
+      media.src = src;
+      media.alt = photoAlts[i] || memory.title || "Herinnering";
+    }
+    media.addEventListener("error", () => figure.classList.add("img-missing"));
+    figure.appendChild(media);
     photoContainer.appendChild(figure);
   });
   if (isGroup) photoWrap.appendChild(photoContainer);
@@ -751,9 +788,15 @@ const MemoryEditor = (function setupMemoryEditor() {
       const wrap = document.createElement("div");
       wrap.className = "edit-memory-photo";
       if (removedPhotos.has(src)) wrap.classList.add("marked-remove");
-      const img = document.createElement("img");
-      img.src = src;
-      img.alt = "";
+      const media = isVideoUrl(src) ? document.createElement("video") : document.createElement("img");
+      if (media.tagName === "VIDEO") {
+        media.muted = true;
+        media.loop = true;
+        media.playsInline = true;
+      } else {
+        media.alt = "";
+      }
+      media.src = src;
       const removeBtn = document.createElement("button");
       removeBtn.type = "button";
       removeBtn.className = "edit-memory-photo-remove";
@@ -764,7 +807,7 @@ const MemoryEditor = (function setupMemoryEditor() {
         else removedPhotos.add(src);
         renderExistingPhotos();
       });
-      wrap.appendChild(img);
+      wrap.appendChild(media);
       wrap.appendChild(removeBtn);
       photosContainer.appendChild(wrap);
     });
@@ -773,10 +816,7 @@ const MemoryEditor = (function setupMemoryEditor() {
   newPhotosInput.addEventListener("change", () => {
     newPreview.innerHTML = "";
     Array.from(newPhotosInput.files).forEach((file) => {
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      img.addEventListener("load", () => URL.revokeObjectURL(img.src));
-      newPreview.appendChild(img);
+      newPreview.appendChild(buildPreviewThumb(file));
     });
   });
 
@@ -896,10 +936,7 @@ const MemoryEditor = (function setupMemoryEditor() {
   photoInput.addEventListener("change", () => {
     preview.innerHTML = "";
     Array.from(photoInput.files).forEach((file) => {
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      img.addEventListener("load", () => URL.revokeObjectURL(img.src));
-      preview.appendChild(img);
+      preview.appendChild(buildPreviewThumb(file));
     });
   });
 
@@ -955,4 +992,146 @@ const MemoryEditor = (function setupMemoryEditor() {
       submitBtn.textContent = "Toevoegen";
     }
   });
+})();
+
+// ============ Editable site text (✏️ next to headings/paragraphs) ============
+// Every [data-editable] element keeps its default text right in the HTML —
+// assets/data/site-text.json only ever stores the ones actually edited
+// (sparse overrides), so nothing needs migrating and a missing/empty file
+// just means "nothing's been customized yet".
+(function setupEditableText() {
+  const targets = Array.from(document.querySelectorAll("[data-editable]"));
+  const modal = document.getElementById("editTextModal");
+  if (!targets.length || !modal) return;
+
+  // textContent can't recover a manually-placed <br> position, so the one
+  // heading that has one keeps its real multi-line default here instead.
+  const MULTILINE_DEFAULTS = {
+    "memory-lane-title": "Let's take a trip\nthrough memory lane",
+  };
+
+  const currentValues = new Map();
+  targets.forEach((el) => {
+    const key = el.dataset.editable;
+    currentValues.set(key, MULTILINE_DEFAULTS[key] || el.textContent.trim());
+  });
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // Re-renders as HTML (not just textContent) so a saved multi-line edit
+  // shows as actual line breaks, then re-attaches the pencil button that
+  // setting innerHTML would otherwise wipe out along with the old text.
+  function renderElement(el, text) {
+    const btn = el.querySelector(".text-edit-btn");
+    el.innerHTML = text.split("\n").map(escapeHtml).join("<br>");
+    if (btn) el.appendChild(btn);
+  }
+
+  const backdrop = document.getElementById("editTextBackdrop");
+  const closeBtn = document.getElementById("editTextClose");
+  const cancelBtn = document.getElementById("editTextCancel");
+  const form = document.getElementById("editTextForm");
+  const textarea = document.getElementById("editTextValue");
+  const banner = document.getElementById("editTextBanner");
+  const saveBtn = document.getElementById("editTextSave");
+
+  let currentKey = null;
+  let currentEl = null;
+
+  function showBanner(message, type) {
+    banner.textContent = message;
+    banner.className = `memory-modal-banner ${type}`;
+  }
+  function clearBanner() {
+    banner.textContent = "";
+    banner.className = "memory-modal-banner";
+  }
+  function closeModal() {
+    modal.hidden = true;
+    document.body.classList.remove("modal-open");
+  }
+
+  function openEditor(key, el) {
+    currentKey = key;
+    currentEl = el;
+    clearBanner();
+    textarea.value = currentValues.get(key) || "";
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+    textarea.focus();
+  }
+
+  if (backdrop) backdrop.addEventListener("click", closeModal);
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !modal.hidden) closeModal();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearBanner();
+    const text = textarea.value.trim();
+    if (!text) return showBanner("Tekst mag niet leeg zijn.", "error");
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Bezig...";
+    try {
+      const data = await backendApi(`/api/site-text/${encodeURIComponent(currentKey)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (!data.dryRun) {
+        currentValues.set(currentKey, text);
+        renderElement(currentEl, text);
+      }
+      showBanner("Opgeslagen! 💗", "success");
+      setTimeout(closeModal, 800);
+    } catch (err) {
+      if (/niet ingelogd/i.test(err.message)) {
+        showBanner("Log eerst in via het tandwiel-icoon.", "error");
+        MemoryAuth.openModal();
+      } else {
+        showBanner(err.message, "error");
+      }
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Opslaan";
+    }
+  });
+
+  targets.forEach((el) => {
+    const key = el.dataset.editable;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "text-edit-btn";
+    btn.title = "Tekst bewerken";
+    btn.setAttribute("aria-label", "Tekst bewerken");
+    btn.textContent = "✏️";
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openEditor(key, el);
+    });
+    el.appendChild(btn);
+  });
+
+  fetch("assets/data/site-text.json", { cache: "no-store" })
+    .then((res) => (res.ok ? res.json() : {}))
+    .then((overrides) => {
+      if (!overrides || typeof overrides !== "object") return;
+      Object.keys(overrides).forEach((key) => {
+        const el = targets.find((t) => t.dataset.editable === key);
+        if (!el) return;
+        currentValues.set(key, overrides[key]);
+        renderElement(el, overrides[key]);
+      });
+    })
+    .catch(() => {
+      // no overrides yet, or offline — the defaults already in the HTML stand
+    });
 })();

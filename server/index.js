@@ -6,8 +6,10 @@ const cookieSession = require("cookie-session");
 
 const authRoutes = require("./src/routes/auth");
 const memoriesRoutes = require("./src/routes/memories");
+const siteTextRoutes = require("./src/routes/siteText");
 const { GitHubError } = require("./src/github");
 const { CloudinaryError } = require("./src/cloudinary");
+const { VideoProcessingError } = require("./src/video");
 
 if (!process.env.SESSION_SECRET) {
   console.warn("WARNING: SESSION_SECRET is not set — using an insecure default. Set it before deploying.");
@@ -53,6 +55,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api", authRoutes);
 app.use("/api/memories", memoriesRoutes);
+app.use("/api/site-text", siteTextRoutes);
 
 app.get("/healthz", (req, res) => res.json({ ok: true, dryRun: process.env.DRY_RUN === "true" }));
 
@@ -69,19 +72,22 @@ app.use((err, req, res, next) => {
   console.error(err);
 
   if (err && err.code === "LIMIT_FILE_SIZE") {
-    return res.status(413).json({ error: "Foto is te groot (max 8MB per foto)." });
+    return res.status(413).json({ error: "Bestand is te groot (max 100MB, video's worden ingekort tot 3 sec)." });
   }
   if (err && err.code === "LIMIT_FILE_COUNT") {
-    return res.status(413).json({ error: "Te veel foto's in 1 keer (max 6)." });
+    return res.status(413).json({ error: "Te veel bestanden in 1 keer (max 6)." });
   }
-  if (err && /Alleen afbeeldingen/.test(err.message || "")) {
+  if (err && /Alleen foto's of video's/.test(err.message || "")) {
     return res.status(400).json({ error: err.message });
   }
   if (err instanceof GitHubError) {
     return res.status(502).json({ error: "GitHub weigerde de wijziging op te slaan. Probeer het opnieuw." });
   }
   if (err instanceof CloudinaryError) {
-    return res.status(502).json({ error: "De foto kon niet geüpload worden. Probeer het opnieuw." });
+    return res.status(502).json({ error: "Het bestand kon niet geüpload worden. Probeer het opnieuw." });
+  }
+  if (err instanceof VideoProcessingError) {
+    return res.status(502).json({ error: "De video kon niet verwerkt worden. Probeer een andere video." });
   }
 
   res.status(500).json({ error: "Er ging iets mis op de server." });

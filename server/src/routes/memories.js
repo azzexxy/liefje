@@ -1,21 +1,39 @@
 const express = require("express");
 const multer = require("multer");
+const path = require("path");
 const { requireAuth } = require("../auth");
-const { uploadPhoto } = require("../cloudinary");
+const { uploadPhoto, uploadVideo } = require("../cloudinary");
+const { trimVideoBuffer, MAX_VIDEO_SECONDS } = require("../video");
 const { getFile, putFile, GitHubError } = require("../github");
 
 const router = express.Router();
 
+// Raw phone video before trimming can be large even for a few seconds
+// (4K, high frame rate) — the limit here is on the upload, not the result.
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 8 * 1024 * 1024, files: 6 },
+  limits: { fileSize: 100 * 1024 * 1024, files: 6 },
   fileFilter: (req, file, cb) => {
-    if (!/^image\//.test(file.mimetype)) {
-      return cb(new Error("Alleen afbeeldingen zijn toegestaan."));
+    if (!/^image\//.test(file.mimetype) && !/^video\//.test(file.mimetype)) {
+      return cb(new Error("Alleen foto's of video's zijn toegestaan."));
     }
     cb(null, true);
   },
 });
+
+// Videos always get cut down to MAX_VIDEO_SECONDS before upload; images pass
+// straight through. Same helper used by both create and edit.
+async function uploadFile(file, publicIdHint) {
+  if (file.mimetype.startsWith("video/")) {
+    const trimmed = await trimVideoBuffer(file.buffer, path.extname(file.originalname));
+    return uploadVideo(trimmed, publicIdHint);
+  }
+  return uploadPhoto(file.buffer, publicIdHint);
+}
+
+function dryRunUrl(id, i, file) {
+  return `https://dry-run.example/${id}-${i}.${file.mimetype.startsWith("video/") ? "mp4" : "jpg"}`;
+}
 
 const DATE_RE = /^\d{1,2}\/\d{1,2}$/;
 const memoriesPath = () => process.env.GITHUB_MEMORIES_PATH || "assets/data/memories.json";
@@ -70,7 +88,7 @@ router.post("/", requireAuth, upload.array("photos", 6), async (req, res, next) 
       return res.status(400).json({ error: "Datum moet het formaat dd/mm hebben, bv. 05/08." });
     }
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: "Voeg minstens 1 foto toe." });
+      return res.status(400).json({ error: "Voeg minstens 1 foto of video toe." });
     }
 
     const dryRun = process.env.DRY_RUN === "true";
@@ -78,9 +96,9 @@ router.post("/", requireAuth, upload.array("photos", 6), async (req, res, next) 
 
     let photos;
     if (dryRun) {
-      photos = req.files.map((_, i) => `https://dry-run.example/${id}-${i}.jpg`);
+      photos = req.files.map((file, i) => dryRunUrl(id, i, file));
     } else {
-      photos = await Promise.all(req.files.map((file, i) => uploadPhoto(file.buffer, `${id}-${i}`)));
+      photos = await Promise.all(req.files.map((file, i) => uploadFile(file, `${id}-${i}`)));
     }
 
     // dd/mm, no year — js/script.js sorts every memory by this and recomputes
@@ -131,10 +149,10 @@ router.patch("/:id", requireAuth, upload.array("photos", 6), async (req, res, ne
     let newPhotos = [];
     if (req.files && req.files.length > 0) {
       if (dryRun) {
-        newPhotos = req.files.map((_, i) => `https://dry-run.example/${id}-edit-${i}.jpg`);
+        newPhotos = req.files.map((file, i) => dryRunUrl(`${id}-edit`, i, file));
       } else {
         newPhotos = await Promise.all(
-          req.files.map((file, i) => uploadPhoto(file.buffer, `${id}-edit-${Date.now()}-${i}`))
+          req.files.map((file, i) => uploadFile(file, `${id}-edit-${Date.now()}-${i}`))
         );
       }
     }

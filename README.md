@@ -42,17 +42,25 @@ throughout.
    ```
    `photos` with more than one entry automatically stack together on one
    side; `photoAlts` is optional (falls back to using the title as alt text
-   for every photo). Add/edit/remove events either through the ⚙️ tools on
-   the live site (see below), or by editing this JSON file directly and
-   pushing.
+   for every photo); a `photos` entry can be a short video instead of an
+   image (any video uploaded through the live tools is automatically cut
+   down to its first 3 seconds before it's saved — see `server/src/video.js`).
+   Add/edit/remove events either through the ⚙️ tools on the live site (see
+   below), or by editing this JSON file directly and pushing.
 5. **Scattered childhood photos** — 3 childhood photos are tucked in as
    small "POV: me when ..." stickers at different points down the page,
    each already using a real photo (`assets/photos/surprise/baby1.jpg`–
    `baby3.jpg`). Search for `.mini-throwback` to find and edit them.
+6. **Every other bit of text** — headings, the personal note, the mini
+   throwback captions, the footer — has a small ✏️ that appears on hover
+   (always visible on touch devices). Edits are saved to
+   `assets/data/site-text.json` (again, sparse — only ever stores what's
+   actually been changed; anything not in there just uses the text already
+   written into `index.html`).
 
 There's no PIN/passcode on the site — anyone with the link can open it.
 
-6. **Adding memories live** — a small ⚙️ at the top of the memory lane
+7. **Adding memories live** — a small ⚙️ at the top of the memory lane
    section opens a login popup (accounts are set up in the backend, see
    [`server/README.md`](server/README.md)); once logged in, a permanent
    "add a memory" card at the end of the timeline lets either of you fill

@@ -80,11 +80,15 @@ request after a while takes a few extra seconds to wake up — that's normal.
 Every failure path returns a clear Dutch-language message instead of a raw
 error or a silent hang:
 - wrong/missing login → 401
-- missing title/place/date, bad date format, no photo, non-image file → 400
-  with a specific message
-- photo over 8MB or more than 6 photos → 413
+- missing title/place/date, bad date format, no photo/video, an unsupported
+  file type → 400 with a specific message
+- a file over 100MB or more than 6 files in one go → 413 (that limit is
+  large on purpose — a raw phone video before trimming can be big even for
+  a couple of seconds; only the first 3 seconds actually get kept)
 - Cloudinary or GitHub outage/misconfiguration → 502, with the underlying
   error logged server-side for debugging
+- a corrupt/unreadable video that ffmpeg can't process → 502, distinct from
+  the Cloudinary one so the two failure modes aren't confused with each other
 - a GitHub commit conflict (someone else saved a memory at the exact same
   moment) is retried automatically with a fresh copy of the file before
   giving up
