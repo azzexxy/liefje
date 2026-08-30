@@ -482,6 +482,26 @@ function buildTimelineItem(memory) {
     text.appendChild(authorRow);
   }
 
+  const controls = document.createElement("div");
+  controls.className = "timeline-edit-controls";
+  const editBtn = document.createElement("button");
+  editBtn.type = "button";
+  editBtn.className = "timeline-edit-btn";
+  editBtn.title = "Bewerken";
+  editBtn.setAttribute("aria-label", "Herinnering bewerken");
+  editBtn.textContent = "✏️";
+  editBtn.addEventListener("click", () => MemoryEditor.openEdit(memory, item));
+  const deleteBtn = document.createElement("button");
+  deleteBtn.type = "button";
+  deleteBtn.className = "timeline-delete-btn";
+  deleteBtn.title = "Verwijderen";
+  deleteBtn.setAttribute("aria-label", "Herinnering verwijderen");
+  deleteBtn.textContent = "🗑️";
+  deleteBtn.addEventListener("click", () => MemoryEditor.deleteMemory(memory, item));
+  controls.appendChild(editBtn);
+  controls.appendChild(deleteBtn);
+
+  item.appendChild(controls);
   item.appendChild(photoWrap);
   item.appendChild(node);
   item.appendChild(text);
@@ -686,6 +706,168 @@ const MemoryAuth = (function setupMemoryModal() {
     getUsername: () => currentUsername,
     ready: sessionReady,
   };
+})();
+
+// ============ Editing/deleting an existing event (✏️ / 🗑️ on hover) ============
+const MemoryEditor = (function setupMemoryEditor() {
+  const modal = document.getElementById("editMemoryModal");
+  if (!modal) return { openEdit() {}, deleteMemory() {} };
+
+  const backdrop = document.getElementById("editMemoryModalBackdrop");
+  const closeBtn = document.getElementById("editMemoryModalClose");
+  const cancelBtn = document.getElementById("editMemoryCancel");
+  const form = document.getElementById("editMemoryForm");
+  const banner = document.getElementById("editMemoryBanner");
+  const titleInput = document.getElementById("editMemoryTitle");
+  const placeInput = document.getElementById("editMemoryPlace");
+  const dateInput = document.getElementById("editMemoryDate");
+  const photosContainer = document.getElementById("editMemoryPhotos");
+  const newPhotosInput = document.getElementById("editMemoryNewPhotos");
+  const newPreview = document.getElementById("editMemoryNewPreview");
+  const saveBtn = document.getElementById("editMemorySave");
+  const DATE_RE = /^\d{1,2}\/\d{1,2}$/;
+
+  let currentMemory = null;
+  let currentItemEl = null;
+  let removedPhotos = new Set();
+
+  function showBanner(message, type) {
+    banner.textContent = message;
+    banner.className = `memory-modal-banner ${type}`;
+  }
+  function clearBanner() {
+    banner.textContent = "";
+    banner.className = "memory-modal-banner";
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    document.body.classList.remove("modal-open");
+  }
+
+  function renderExistingPhotos() {
+    photosContainer.innerHTML = "";
+    (currentMemory.photos || []).forEach((src) => {
+      const wrap = document.createElement("div");
+      wrap.className = "edit-memory-photo";
+      if (removedPhotos.has(src)) wrap.classList.add("marked-remove");
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = "";
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "edit-memory-photo-remove";
+      removeBtn.title = removedPhotos.has(src) ? "Terugzetten" : "Verwijderen";
+      removeBtn.textContent = removedPhotos.has(src) ? "↺" : "×";
+      removeBtn.addEventListener("click", () => {
+        if (removedPhotos.has(src)) removedPhotos.delete(src);
+        else removedPhotos.add(src);
+        renderExistingPhotos();
+      });
+      wrap.appendChild(img);
+      wrap.appendChild(removeBtn);
+      photosContainer.appendChild(wrap);
+    });
+  }
+
+  newPhotosInput.addEventListener("change", () => {
+    newPreview.innerHTML = "";
+    Array.from(newPhotosInput.files).forEach((file) => {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.addEventListener("load", () => URL.revokeObjectURL(img.src));
+      newPreview.appendChild(img);
+    });
+  });
+
+  function openEdit(memory, itemEl) {
+    currentMemory = memory;
+    currentItemEl = itemEl;
+    removedPhotos = new Set();
+    clearBanner();
+    titleInput.value = memory.title || "";
+    placeInput.value = memory.place || "";
+    dateInput.value = memory.date || "";
+    newPhotosInput.value = "";
+    newPreview.innerHTML = "";
+    renderExistingPhotos();
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+  }
+
+  if (backdrop) backdrop.addEventListener("click", closeModal);
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !modal.hidden) closeModal();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearBanner();
+    const title = titleInput.value.trim();
+    const place = placeInput.value.trim();
+    const date = dateInput.value.trim();
+    if (!title) return showBanner("Titel mag niet leeg zijn.", "error");
+    if (!place) return showBanner("Plaats mag niet leeg zijn.", "error");
+    if (!DATE_RE.test(date)) return showBanner("Datum moet dd/mm zijn.", "error");
+
+    const remainingCount = (currentMemory.photos || []).length - removedPhotos.size + newPhotosInput.files.length;
+    if (remainingCount <= 0) return showBanner("Er moet minstens 1 foto overblijven.", "error");
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Bezig...";
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("place", place);
+    formData.append("date", date);
+    formData.append("photosToRemove", JSON.stringify(Array.from(removedPhotos)));
+    Array.from(newPhotosInput.files).forEach((file) => formData.append("photos", file));
+
+    try {
+      const data = await backendApi(`/api/memories/${encodeURIComponent(currentMemory.id)}`, {
+        method: "PATCH",
+        body: formData,
+      });
+      if (!data.dryRun && data.memory) {
+        currentItemEl.remove();
+        const item = insertMemoryIntoTimeline(data.memory);
+        if (item) item.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      showBanner("Opgeslagen! 💗", "success");
+      setTimeout(closeModal, 900);
+    } catch (err) {
+      if (/niet ingelogd/i.test(err.message)) {
+        showBanner("Log eerst in via het tandwiel-icoon.", "error");
+        MemoryAuth.openModal();
+      } else {
+        showBanner(err.message, "error");
+      }
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Opslaan";
+    }
+  });
+
+  async function deleteMemory(memory, itemEl) {
+    if (!confirm(`"${memory.title}" verwijderen? Dit kan niet ongedaan gemaakt worden.`)) return;
+    try {
+      const data = await backendApi(`/api/memories/${encodeURIComponent(memory.id)}`, { method: "DELETE" });
+      if (!data.dryRun) {
+        itemEl.remove();
+        pinTimelineFooter(timelineEl.querySelectorAll(REAL_TIMELINE_ITEM).length);
+      }
+    } catch (err) {
+      if (/niet ingelogd/i.test(err.message)) {
+        MemoryAuth.openModal();
+      } else {
+        alert(err.message);
+      }
+    }
+  }
+
+  return { openEdit, deleteMemory };
 })();
 
 // ============ Inline "add memory" card, always last in the timeline ============

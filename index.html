@@ -186,6 +186,37 @@
   </div>
 </div>
 
+<!-- ===================== EDIT MEMORY MODAL (✏️ on hover over any event) ===================== -->
+<div id="editMemoryModal" class="memory-modal" hidden>
+  <div class="memory-modal-backdrop" id="editMemoryModalBackdrop"></div>
+  <div class="card memory-modal-card" role="dialog" aria-modal="true" aria-label="Herinnering bewerken">
+    <button type="button" class="memory-modal-close" id="editMemoryModalClose" aria-label="Sluiten">&times;</button>
+    <h2 class="memory-modal-title">herinnering bewerken ✏️</h2>
+
+    <div id="editMemoryBanner" class="memory-modal-banner"></div>
+
+    <form id="editMemoryForm" class="memory-modal-form">
+      <label for="editMemoryTitle">Titel / tekst</label>
+      <input type="text" id="editMemoryTitle" required maxlength="300" />
+
+      <label for="editMemoryPlace">Plaats</label>
+      <input type="text" id="editMemoryPlace" required maxlength="80" />
+
+      <label for="editMemoryDate">Datum (dd/mm)</label>
+      <input type="text" id="editMemoryDate" required pattern="\d{1,2}/\d{1,2}" />
+
+      <label>Foto's</label>
+      <div id="editMemoryPhotos" class="edit-memory-photos"></div>
+      <label for="editMemoryNewPhotos">Foto's toevoegen</label>
+      <input type="file" id="editMemoryNewPhotos" accept="image/*" multiple />
+      <div id="editMemoryNewPreview" class="timeline-add-preview"></div>
+
+      <button type="submit" id="editMemorySave" class="btn-primary">Opslaan</button>
+      <button type="button" id="editMemoryCancel" class="btn-secondary">Annuleren</button>
+    </form>
+  </div>
+</div>
+
 <script src="js/script.js"></script>
 </body>
 </html>
