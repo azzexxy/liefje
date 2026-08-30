@@ -84,7 +84,7 @@ router.post("/", requireAuth, upload.array("photos", 6), async (req, res, next) 
       // right spot on the timeline, recomputing left/right automatically.
       date: date.trim(),
       photos,
-      addedBy: req.session.user,
+      addedBy: req.authUser,
       createdAt: new Date().toISOString(),
     };
 

@@ -11,6 +11,36 @@ const adminGear = document.getElementById("adminGear");
 // deliberate "open in new tab") — a normal click opens the inline modal below.
 if (adminGear) adminGear.href = ADMIN_PANEL_URL;
 
+// Auth for the public site talking to the backend cross-origin. Safari (and
+// to a lesser extent Firefox) blocks cross-site cookies by default even with
+// SameSite=None; Secure, so login instead also returns a token that we keep
+// in localStorage and send as an Authorization header — not a cookie, so
+// none of that cross-site blocking applies to it.
+const AUTH_TOKEN_KEY = "liefje_auth_token";
+const getAuthToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
+const setAuthToken = (token) => localStorage.setItem(AUTH_TOKEN_KEY, token);
+const clearAuthToken = () => localStorage.removeItem(AUTH_TOKEN_KEY);
+
+async function backendApi(path, options) {
+  const token = getAuthToken();
+  const headers = { ...(options && options.headers) };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  let res;
+  try {
+    res = await fetch(BACKEND_URL + path, { credentials: "include", ...options, headers });
+  } catch {
+    throw new Error("Kon de server niet bereiken. Check je internetverbinding en probeer opnieuw.");
+  }
+  let data = {};
+  try {
+    data = await res.json();
+  } catch {
+    // non-JSON response — fall through with empty data
+  }
+  if (!res.ok) throw new Error(data.error || `Er ging iets mis (${res.status}).`);
+  return data;
+}
+
 // ============ Floating background hearts ============
 const heartsBg = document.getElementById("hearts-bg");
 const HEART_CHARS = ["💗", "💕", "💖", "🌸", "♥"];
@@ -456,22 +486,41 @@ function buildTimelineItem(memory) {
   return item;
 }
 
+// The compose card at the end isn't a memory, so it's excluded from every
+// selector below via :not(.timeline-add-card).
+const REAL_TIMELINE_ITEM = ".timeline-item:not(.timeline-add-card)";
+
 function tagStaticTimelineItems() {
   if (!timelineEl) return;
-  timelineEl.querySelectorAll(".timeline-item").forEach((item) => {
+  timelineEl.querySelectorAll(REAL_TIMELINE_ITEM).forEach((item) => {
     if (item.dataset.sortKey === undefined) item.dataset.sortKey = String(dateSortKey(item.dataset.date));
   });
 }
 
+// Keeps the add-card and the "more to come" badge pinned as the last two
+// children, continuing the left/right zigzag from wherever the real items
+// left off — called after any insert/sort so they never end up stranded
+// in the middle of the timeline.
+function pinTimelineFooter(realItemCount) {
+  const addCard = document.getElementById("timelineAddCard");
+  if (addCard) {
+    addCard.classList.remove("side-left", "side-right");
+    addCard.classList.add(realItemCount % 2 === 0 ? "side-left" : "side-right");
+    timelineEl.appendChild(addCard);
+  }
+  if (timelineContinueBadge) timelineEl.appendChild(timelineContinueBadge);
+}
+
 function reorderTimelineByDate() {
   if (!timelineEl || !timelineContinueBadge) return;
-  const items = Array.from(timelineEl.querySelectorAll(".timeline-item"));
+  const items = Array.from(timelineEl.querySelectorAll(REAL_TIMELINE_ITEM));
   items.sort((a, b) => Number(a.dataset.sortKey) - Number(b.dataset.sortKey));
   items.forEach((item, i) => {
     item.classList.remove("side-left", "side-right");
     item.classList.add(i % 2 === 0 ? "side-left" : "side-right");
     timelineEl.insertBefore(item, timelineContinueBadge);
   });
+  pinTimelineFooter(items.length);
 }
 
 const timelineRevealObserver = new IntersectionObserver(
@@ -504,6 +553,11 @@ function insertMemoryIntoTimeline(memory) {
 (function loadDynamicMemories() {
   if (!timelineEl || !timelineContinueBadge) return;
   tagStaticTimelineItems();
+  // Gives the add-card its side class and correct position immediately,
+  // even if memories.json turns out empty (reorderTimelineByDate below
+  // would otherwise be the only thing setting it, and that's skipped when
+  // there's nothing dynamic to insert).
+  pinTimelineFooter(timelineEl.querySelectorAll(REAL_TIMELINE_ITEM).length);
 
   fetch("assets/data/memories.json", { cache: "no-store" })
     .then((res) => (res.ok ? res.json() : []))
@@ -517,9 +571,11 @@ function insertMemoryIntoTimeline(memory) {
 })();
 
 // ============ Inline "add memory" modal (opens from the ⚙️ instead of navigating away) ============
-(function setupMemoryModal() {
+// Login/logout only — adding a memory happens inline in the timeline itself
+// (see the add-card further down), not in this modal.
+const MemoryAuth = (function setupMemoryModal() {
   const modal = document.getElementById("memoryModal");
-  if (!modal) return;
+  if (!modal) return { openModal() {}, isLoggedIn: () => false };
 
   const backdrop = document.getElementById("memoryModalBackdrop");
   const closeBtn = document.getElementById("memoryModalClose");
@@ -528,11 +584,10 @@ function insertMemoryIntoTimeline(memory) {
   const whoamiAvatar = document.getElementById("memoryModalAvatar");
   const whoamiText = document.getElementById("memoryModalWhoamiText");
   const loginForm = document.getElementById("memoryModalLoginForm");
-  const uploadForm = document.getElementById("memoryModalUploadForm");
-  const submitBtn = document.getElementById("memoryModalSubmit");
+  const loggedInPanel = document.getElementById("memoryModalLoggedIn");
   const logoutBtn = document.getElementById("memoryModalLogout");
-  const photosInput = document.getElementById("memoryModalPhotos");
-  const preview = document.getElementById("memoryModalPreview");
+
+  let currentUsername = null;
 
   function showBanner(message, type) {
     banner.textContent = message;
@@ -543,26 +598,10 @@ function insertMemoryIntoTimeline(memory) {
     banner.className = "memory-modal-banner";
   }
 
-  async function api(path, options) {
-    let res;
-    try {
-      res = await fetch(BACKEND_URL + path, { credentials: "include", ...options });
-    } catch {
-      throw new Error("Kon de server niet bereiken. Check je internetverbinding en probeer opnieuw.");
-    }
-    let data = {};
-    try {
-      data = await res.json();
-    } catch {
-      // non-JSON response — fall through with empty data
-    }
-    if (!res.ok) throw new Error(data.error || `Er ging iets mis (${res.status}).`);
-    return data;
-  }
-
   function showLoggedIn(username) {
+    currentUsername = username;
     loginForm.hidden = true;
-    uploadForm.hidden = false;
+    loggedInPanel.hidden = false;
     whoami.hidden = false;
     whoamiText.textContent = `ingelogd als ${username}`;
     const author = AUTHORS[username];
@@ -575,20 +614,24 @@ function insertMemoryIntoTimeline(memory) {
     }
   }
   function showLoggedOut() {
+    currentUsername = null;
     loginForm.hidden = false;
-    uploadForm.hidden = true;
+    loggedInPanel.hidden = true;
     whoami.hidden = true;
   }
 
   async function checkSession() {
     try {
-      const { user } = await api("/api/me");
+      const { user } = await backendApi("/api/me");
       if (user) showLoggedIn(user);
       else showLoggedOut();
     } catch {
       showLoggedOut();
     }
   }
+  // Runs once on page load so the inline add-card knows the login state
+  // without needing the modal to have been opened first.
+  const sessionReady = checkSession();
 
   function openModal() {
     modal.hidden = false;
@@ -619,12 +662,15 @@ function insertMemoryIntoTimeline(memory) {
     const username = document.getElementById("memoryModalUsername").value.trim();
     const password = document.getElementById("memoryModalPassword").value;
     try {
-      const data = await api("/api/login", {
+      const data = await backendApi("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
+      if (data.token) setAuthToken(data.token);
       showLoggedIn(data.username);
+      document.dispatchEvent(new CustomEvent("liefje:login", { detail: { username: data.username } }));
+      setTimeout(closeModal, 900);
     } catch (err) {
       showBanner(err.message, "error");
     }
@@ -632,17 +678,50 @@ function insertMemoryIntoTimeline(memory) {
 
   logoutBtn.addEventListener("click", async () => {
     clearBanner();
+    clearAuthToken();
     try {
-      await api("/api/logout", { method: "POST" });
+      await backendApi("/api/logout", { method: "POST" });
     } catch {
       // logging out regardless
     }
     showLoggedOut();
+    document.dispatchEvent(new CustomEvent("liefje:logout"));
   });
 
-  photosInput.addEventListener("change", () => {
+  return {
+    openModal,
+    isLoggedIn: () => !!currentUsername,
+    getUsername: () => currentUsername,
+    ready: sessionReady,
+  };
+})();
+
+// ============ Inline "add memory" card, always last in the timeline ============
+(function setupTimelineAddCard() {
+  const form = document.getElementById("timelineAddForm");
+  if (!form) return;
+
+  const photoInput = document.getElementById("timelineAddPhotoInput");
+  const preview = document.getElementById("timelineAddPreview");
+  const placeInput = document.getElementById("timelineAddPlace");
+  const dateInput = document.getElementById("timelineAddDate");
+  const titleInput = document.getElementById("timelineAddTitle");
+  const banner = document.getElementById("timelineAddBanner");
+  const submitBtn = document.getElementById("timelineAddSubmit");
+  const DATE_RE = /^\d{1,2}\/\d{1,2}$/;
+
+  function showBanner(message, type) {
+    banner.textContent = message;
+    banner.className = `memory-modal-banner ${type}`;
+  }
+  function clearBanner() {
+    banner.textContent = "";
+    banner.className = "memory-modal-banner";
+  }
+
+  photoInput.addEventListener("change", () => {
     preview.innerHTML = "";
-    Array.from(photosInput.files).forEach((file) => {
+    Array.from(photoInput.files).forEach((file) => {
       const img = document.createElement("img");
       img.src = URL.createObjectURL(file);
       img.addEventListener("load", () => URL.revokeObjectURL(img.src));
@@ -650,14 +729,36 @@ function insertMemoryIntoTimeline(memory) {
     });
   });
 
-  uploadForm.addEventListener("submit", async (e) => {
+  function resetCard() {
+    form.reset();
+    preview.innerHTML = "";
+  }
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearBanner();
+
+    const title = titleInput.value.trim();
+    const place = placeInput.value.trim();
+    const date = dateInput.value.trim();
+    if (!title) return showBanner("Vertel iets over dit moment.", "error");
+    if (!place) return showBanner("Plaats is verplicht.", "error");
+    if (!DATE_RE.test(date)) return showBanner("Datum moet dd/mm zijn, bv. 05/08.", "error");
+    if (!photoInput.files || photoInput.files.length === 0) {
+      return showBanner("Voeg minstens 1 foto toe.", "error");
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = "Bezig...";
 
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("place", place);
+    formData.append("date", date);
+    Array.from(photoInput.files).forEach((file) => formData.append("photos", file));
+
     try {
-      const data = await api("/api/memories", { method: "POST", body: new FormData(uploadForm) });
+      const data = await backendApi("/api/memories", { method: "POST", body: formData });
       if (!data.dryRun) {
         const item = insertMemoryIntoTimeline(data.memory);
         if (item) {
@@ -666,12 +767,15 @@ function insertMemoryIntoTimeline(memory) {
           burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 160);
         }
       }
-      showBanner("Toegevoegd! Ze staat er meteen bij op de site.", "success");
-      uploadForm.reset();
-      preview.innerHTML = "";
-      setTimeout(closeModal, 1400);
+      showBanner("Toegevoegd! 💗", "success");
+      resetCard();
     } catch (err) {
-      showBanner(err.message, "error");
+      if (/niet ingelogd/i.test(err.message)) {
+        showBanner("Log eerst in via het tandwiel-icoon hierboven.", "error");
+        MemoryAuth.openModal();
+      } else {
+        showBanner(err.message, "error");
+      }
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Toevoegen";

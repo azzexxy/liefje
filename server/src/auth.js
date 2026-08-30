@@ -1,4 +1,9 @@
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+function tokenSecret() {
+  return process.env.SESSION_SECRET || "dev-only-secret-change-me";
+}
 
 function parseUsers() {
   const raw = process.env.USERS || "";
@@ -30,9 +35,36 @@ async function verifyCredentials(username, password) {
   }
 }
 
-function requireAuth(req, res, next) {
-  if (req.session && req.session.user) return next();
-  return res.status(401).json({ error: "Je bent niet ingelogd." });
+// Safari (and Firefox, to a lesser extent) blocks cross-site cookies by
+// default even with SameSite=None; Secure — so the session cookie only
+// reliably works same-origin (admin.html). Cross-origin callers (the
+// inline modal on the public site) instead get a bearer token issued at
+// login and send it back as `Authorization: Bearer <token>`, which isn't a
+// cookie and isn't subject to any of that cross-site blocking.
+function issueToken(username) {
+  return jwt.sign({ user: username }, tokenSecret(), { expiresIn: "365d" });
 }
 
-module.exports = { verifyCredentials, requireAuth, USERS };
+function userFromBearerToken(req) {
+  const match = /^Bearer\s+(.+)$/.exec(req.headers.authorization || "");
+  if (!match) return null;
+  try {
+    return jwt.verify(match[1], tokenSecret()).user || null;
+  } catch {
+    return null;
+  }
+}
+
+function currentUser(req) {
+  if (req.session && req.session.user) return req.session.user;
+  return userFromBearerToken(req);
+}
+
+function requireAuth(req, res, next) {
+  const user = currentUser(req);
+  if (!user) return res.status(401).json({ error: "Je bent niet ingelogd." });
+  req.authUser = user;
+  next();
+}
+
+module.exports = { verifyCredentials, requireAuth, issueToken, currentUser, USERS };

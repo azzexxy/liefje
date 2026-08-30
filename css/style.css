@@ -911,8 +911,7 @@ body.modal-open {
 }
 
 .memory-modal-form input[type="text"],
-.memory-modal-form input[type="password"],
-.memory-modal-form input[type="file"] {
+.memory-modal-form input[type="password"] {
   width: 100%;
   padding: 10px 12px;
   border-radius: 12px;
@@ -922,39 +921,11 @@ body.modal-open {
   background: var(--pink-50);
 }
 
-/* Kept as two separate rules on purpose — a browser that doesn't recognize
-   one of these two pseudo-elements would drop the entire rule if they were
-   combined with a comma, not just that one selector. */
-.memory-modal-form input[type="file"]::file-selector-button {
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: white;
-  background: linear-gradient(135deg, var(--pink-400), var(--pink-deep));
-  border: none;
-  border-radius: 999px;
-  padding: 8px 16px;
-  margin-right: 12px;
-  cursor: pointer;
-}
-
-.memory-modal-form input[type="file"]::-webkit-file-upload-button {
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: white;
-  background: linear-gradient(135deg, var(--pink-400), var(--pink-deep));
-  border: none;
-  border-radius: 999px;
-  padding: 8px 16px;
-  margin-right: 12px;
-  cursor: pointer;
-}
-
 .memory-modal-hint {
-  font-size: 0.8rem;
-  opacity: 0.7;
-  margin: 4px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin: 4px 0 14px;
+  text-align: center;
 }
 
 .memory-modal-form .btn-primary,
@@ -963,21 +934,6 @@ body.modal-open {
   margin-top: 18px;
   padding: 12px;
   font-size: 0.95rem;
-}
-
-.memory-modal-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.memory-modal-preview img {
-  width: 64px;
-  height: 64px;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 2px solid var(--pink-200);
 }
 
 .memory-modal-banner {
@@ -998,4 +954,100 @@ body.modal-open {
   display: block;
   background: #e3f9ea;
   color: #226a3f;
+}
+
+/* ============ Inline "add memory" card, always last in the timeline ============ */
+.timeline-add-photo-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 220px;
+  height: 260px;
+  padding: 14px;
+  background: white;
+  box-shadow: var(--shadow);
+  border: 2px dashed var(--pink-300);
+  color: var(--pink-500);
+  font-size: 0.85rem;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.timeline-add-photo-slot:hover {
+  transform: scale(1.03);
+  border-color: var(--pink-deep);
+}
+
+.timeline-add-plus {
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--pink-400);
+}
+
+.timeline-add-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.timeline-add-preview img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid var(--pink-200);
+}
+
+.timeline-add-input {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  border: none;
+  border-bottom: 2px dashed var(--pink-200);
+  background: transparent;
+  padding: 4px 2px;
+  margin-right: 10px;
+}
+
+.timeline-add-input::placeholder {
+  color: var(--pink-400);
+  opacity: 0.9;
+}
+
+.timeline-add-date-input {
+  width: 4.5em;
+}
+
+.timeline-add-textarea {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--pink-deep);
+  background: transparent;
+  border: none;
+  border-bottom: 2px dashed var(--pink-200);
+  resize: vertical;
+  padding: 4px 2px 8px;
+}
+
+.timeline-add-textarea::placeholder {
+  color: var(--pink-300);
+}
+
+.timeline-add-input:focus,
+.timeline-add-textarea:focus {
+  outline: none;
+  border-bottom-color: var(--pink-deep);
+}
+
+.timeline-add-submit {
+  margin-top: 12px;
+  padding: 10px 26px;
+  font-size: 0.9rem;
 }

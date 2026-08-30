@@ -268,6 +268,33 @@
       </div>
     </div>
 
+    <!-- Always-last placeholder "compose" card — js/script.js keeps it pinned
+         to the end and recomputes its side. Filling it in and submitting
+         (needs to be logged in via the ⚙️ above) inserts a real memory at
+         its correct chronological spot, then this card resets to empty. -->
+    <div class="timeline-item timeline-add-card" id="timelineAddCard">
+      <div class="timeline-photo">
+        <label class="timeline-add-photo-slot" for="timelineAddPhotoInput">
+          <span class="timeline-add-plus">+</span>
+          <span>foto's toevoegen</span>
+        </label>
+        <input type="file" id="timelineAddPhotoInput" accept="image/*" multiple hidden />
+        <div class="timeline-add-preview" id="timelineAddPreview"></div>
+      </div>
+      <div class="timeline-node"></div>
+      <div class="timeline-text">
+        <form id="timelineAddForm">
+          <p class="timeline-date">
+            <input type="text" id="timelineAddPlace" class="timeline-add-input" placeholder="📍 plaats" maxlength="80" />
+            <input type="text" id="timelineAddDate" class="timeline-add-input timeline-add-date-input" placeholder="dd/mm" maxlength="5" />
+          </p>
+          <textarea id="timelineAddTitle" class="timeline-add-textarea" placeholder="typ hier je herinnering..." rows="2" maxlength="300"></textarea>
+          <div id="timelineAddBanner" class="memory-modal-banner"></div>
+          <button type="submit" id="timelineAddSubmit" class="btn-primary timeline-add-submit">Toevoegen</button>
+        </form>
+      </div>
+    </div>
+
     <!-- signals more memories are still to come, without needing a real item -->
     <div class="timeline-continue">
       <span class="timeline-continue-badge">en nog veel leuke momentjes die komen</span>
@@ -311,24 +338,10 @@
       <button type="submit" class="btn-primary">Inloggen</button>
     </form>
 
-    <form id="memoryModalUploadForm" class="memory-modal-form" hidden>
-      <label for="memoryModalTitle">Titel / tekst bij dit moment</label>
-      <input type="text" id="memoryModalTitle" name="title" required maxlength="300" placeholder="Typ hier..." />
-
-      <label for="memoryModalPlace">Plaats</label>
-      <input type="text" id="memoryModalPlace" name="place" required maxlength="80" placeholder="bv. Gent" />
-
-      <label for="memoryModalDate">Datum (dd/mm)</label>
-      <input type="text" id="memoryModalDate" name="date" required pattern="\d{1,2}/\d{1,2}" placeholder="bv. 05/08" />
-      <p class="memory-modal-hint">Bepaalt automatisch waar dit op de tijdlijn komt te staan.</p>
-
-      <label for="memoryModalPhotos">Foto's (max 6, max 8MB per foto)</label>
-      <input type="file" id="memoryModalPhotos" name="photos" accept="image/*" multiple required />
-      <div id="memoryModalPreview" class="memory-modal-preview"></div>
-
-      <button type="submit" id="memoryModalSubmit" class="btn-primary">Toevoegen</button>
+    <div id="memoryModalLoggedIn" class="memory-modal-form" hidden>
+      <p class="memory-modal-hint">Scroll naar beneden naar de tijdlijn — daar kan je nu een nieuwe herinnering invullen.</p>
       <button type="button" id="memoryModalLogout" class="btn-secondary">Uitloggen</button>
-    </form>
+    </div>
   </div>
 </div>
 
