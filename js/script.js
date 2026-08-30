@@ -1,3 +1,8 @@
+// The browser's own scroll-restoration-on-reload otherwise fights with our
+// deliberate jump to memory lane below, sometimes winning and resetting the
+// scroll back to the top after we've already positioned it.
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
 // ============ Admin panel link (update after deploying the backend in server/) ============
 const ADMIN_PANEL_URL = "https://YOUR-RENDER-URL.onrender.com/admin.html";
 const adminGear = document.getElementById("adminGear");
@@ -142,6 +147,35 @@ if (timelines.length) {
   });
 }
 
+// ============ Remembering progress across visits (puzzle solved / candles blown) ============
+const PUZZLE_SOLVED_KEY = "liefje_puzzle_solved";
+const CANDLES_BLOWN_KEY = "liefje_candles_blown";
+
+// Un-hides everything with `className` (removing it triggers the fade-in),
+// and optionally scrolls to `scrollTarget` after `delay` ms once revealed.
+function revealLocked(className, scrollTarget, delay) {
+  document.querySelectorAll(`.${className}`).forEach((el) => {
+    el.classList.remove(className);
+    el.classList.add("reveal-fade");
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("shown")));
+  });
+  if (scrollTarget) {
+    setTimeout(() => {
+      const target = document.querySelector(scrollTarget);
+      if (target) target.scrollIntoView({ behavior: "smooth" });
+    }, delay || 0);
+  }
+}
+
+// Same, but skips the fade-in animation entirely — for content that was
+// already unlocked on a previous visit, where there's nothing to "reveal".
+// (The animated version depends on two requestAnimationFrame ticks, which
+// browsers can throttle unpredictably right at page load, sometimes leaving
+// content invisible for seconds — not worth the risk for a no-op skip.)
+function revealLockedInstant(className) {
+  document.querySelectorAll(`.${className}`).forEach((el) => el.classList.remove(className));
+}
+
 // ============ Puzzle gate: solve the picture to unlock the memories below ============
 // Easy mode: click any two tiles to swap them (no sliding, no blank tile) —
 // any shuffle is reachable this way, so it's always solvable.
@@ -149,7 +183,6 @@ const puzzleBoard = document.getElementById("puzzleBoard");
 if (puzzleBoard) {
   const GRID = 3;
   const imageUrl = puzzleBoard.dataset.image;
-  const PUZZLE_SOLVED_KEY = "liefje_puzzle_solved";
   let tiles = [];
   let selectedIndex = null;
   let solved = localStorage.getItem(PUZZLE_SOLVED_KEY) === "1";
@@ -212,20 +245,6 @@ if (puzzleBoard) {
     checkSolved();
   }
 
-  function revealLockedContent(withScroll) {
-    document.querySelectorAll(".locked-content").forEach((el) => {
-      el.classList.remove("locked-content");
-      el.classList.add("reveal-fade");
-      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("shown")));
-    });
-    if (withScroll) {
-      setTimeout(() => {
-        const target = document.getElementById("cakeReveal");
-        if (target) target.scrollIntoView({ behavior: "smooth" });
-      }, 900);
-    }
-  }
-
   function checkSolved() {
     const isSolved = tiles.every((v, i) => v === i);
     if (!isSolved) return;
@@ -236,7 +255,7 @@ if (puzzleBoard) {
     if (msg) msg.textContent = "Opgelost! 🎉";
     const rect = puzzleBoard.getBoundingClientRect();
     burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 220);
-    revealLockedContent(true);
+    revealLocked("locked-content", "#cakeReveal", 900);
   }
 
   const probe = new Image();
@@ -259,7 +278,7 @@ if (puzzleBoard) {
     puzzleBoard.classList.add("solved");
     const msg = document.getElementById("puzzleMsg");
     if (msg) msg.textContent = "Alweer opgelost! 💗";
-    revealLockedContent(false);
+    revealLockedInstant("locked-content");
   }
 }
 
@@ -267,10 +286,12 @@ if (puzzleBoard) {
 const candlesRow = document.getElementById("candlesRow");
 const blowBigBtn = document.getElementById("blowBigBtn");
 if (candlesRow && blowBigBtn) {
+  let bigCakeBlown = localStorage.getItem(CANDLES_BLOWN_KEY) === "1";
+
   const CANDLE_COUNT = 21;
   for (let i = 0; i < CANDLE_COUNT; i++) {
     const candle = document.createElement("div");
-    candle.className = "candle-mini";
+    candle.className = bigCakeBlown ? "candle-mini blown" : "candle-mini";
     const flame = document.createElement("div");
     flame.className = "flame-mini";
     candle.appendChild(flame);
@@ -281,8 +302,16 @@ if (candlesRow && blowBigBtn) {
   const BLOW_MESSAGES = ["Blaas nog eens", "Blaas harder", "Bijna..."];
   const TOTAL_BLOWS = BLOW_MESSAGES.length + 1;
   const bigCakeMsg = document.getElementById("bigCakeMsg");
-  let bigCakeBlown = false;
   let blowCount = 0;
+
+  // Already blown out on a previous visit — show the cake already done
+  // instead of making her blow them out again.
+  if (bigCakeBlown) {
+    blowBigBtn.disabled = true;
+    blowBigBtn.textContent = "Al gedaan 💗";
+    if (bigCakeMsg) bigCakeMsg.textContent = "Wensjes al gedaan! welkom terug bij onze herinneringen... 💗";
+    revealLockedInstant("locked-content-final");
+  }
 
   blowBigBtn.addEventListener("click", () => {
     if (bigCakeBlown) return;
@@ -309,20 +338,33 @@ if (candlesRow && blowBigBtn) {
     }
 
     bigCakeBlown = true;
+    localStorage.setItem(CANDLES_BLOWN_KEY, "1");
     blowBigBtn.disabled = true;
     if (bigCakeMsg) bigCakeMsg.textContent = "21 wensjes gedaan! welkom bij onze herinneringen... 💗";
 
-    setTimeout(() => {
-      document.querySelectorAll(".locked-content-final").forEach((el) => {
-        el.classList.remove("locked-content-final");
-        el.classList.add("reveal-fade");
-        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("shown")));
-      });
-      const target = document.querySelector(".memory-lane-section");
-      if (target) target.scrollIntoView({ behavior: "smooth" });
-    }, toBlow.length * 60 + 900);
+    revealLocked("locked-content-final", ".memory-lane-section", toBlow.length * 60 + 900);
   });
 }
+
+// ============ Already done both steps before — skip straight to memory lane ============
+(function skipToMemoryLaneIfAlreadyDone() {
+  const alreadyDone =
+    localStorage.getItem(PUZZLE_SOLVED_KEY) === "1" && localStorage.getItem(CANDLES_BLOWN_KEY) === "1";
+  if (!alreadyDone) return;
+
+  function jump() {
+    const target = document.querySelector(".memory-lane-section");
+    // "instant" (not "auto") is required here — the site sets a global
+    // `scroll-behavior: smooth`, which "auto" would defer to, turning this
+    // into a multi-second crawl down a ~2000px page on every single visit.
+    if (target) target.scrollIntoView({ behavior: "instant", block: "start" });
+  }
+  if (document.readyState === "complete") {
+    setTimeout(jump, 50);
+  } else {
+    window.addEventListener("load", () => setTimeout(jump, 50));
+  }
+})();
 
 // ============ Dynamically added memories (posted through the admin panel) ============
 // Reads assets/data/memories.json and weaves matching .timeline-item elements
