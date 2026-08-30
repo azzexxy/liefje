@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": "test-1788058769708",
+    "title": "Test",
+    "place": "Test",
+    "date": "13/07",
+    "photos": [
+      "https://res.cloudinary.com/pl6n2ggy/image/upload/v1788058770/liefje-memories/test-1788058769708-0.png"
+    ],
+    "addedBy": "Lothar",
+    "createdAt": "2026-08-30T02:59:31.273Z"
+  }
+]
