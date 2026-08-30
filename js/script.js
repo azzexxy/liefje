@@ -4,7 +4,7 @@
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
 // ============ Backend (update after deploying it — see server/) ============
-const BACKEND_URL = "https://YOUR-RENDER-URL.onrender.com";
+const BACKEND_URL = "https://liefje.onrender.com";
 const ADMIN_PANEL_URL = `${BACKEND_URL}/admin.html`;
 const adminGear = document.getElementById("adminGear");
 // The href still points at the full admin page (works with JS off, or a
