@@ -168,9 +168,10 @@
       <input type="text" id="date" name="date" required pattern="\d{1,2}/\d{1,2}" placeholder="bv. 05/08" />
       <p class="hint">Bepaalt automatisch waar dit op de tijdlijn komt te staan.</p>
 
-      <label for="photos">Foto's of video's (max 6) — video's worden automatisch ingekort tot 3 sec</label>
+      <label for="photos">Foto's of video's (max 6)</label>
       <input type="file" id="photos" name="photos" accept="image/*,video/*" multiple required />
       <div id="photoPreview" class="preview"></div>
+      <p class="hint">video's worden ingekort tot 3 sec</p>
 
       <button type="submit" id="submitBtn">Toevoegen</button>
       <button type="button" class="secondary" id="logoutBtn">Uitloggen</button>
