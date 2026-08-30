@@ -55,14 +55,11 @@ async function commitMemory(memory, attempt = 1) {
 
 router.post("/", requireAuth, upload.array("photos", 6), async (req, res, next) => {
   try {
-    const { title, place, date, side } = req.body;
+    const { title, place, date } = req.body;
     if (!title || !title.trim()) return res.status(400).json({ error: "Titel is verplicht." });
     if (!place || !place.trim()) return res.status(400).json({ error: "Plaats is verplicht." });
     if (!date || !DATE_RE.test(date.trim())) {
       return res.status(400).json({ error: "Datum moet het formaat dd/mm hebben, bv. 05/08." });
-    }
-    if (side && side !== "left" && side !== "right") {
-      return res.status(400).json({ error: "Ongeldige kant gekozen." });
     }
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: "Voeg minstens 1 foto toe." });
@@ -82,8 +79,10 @@ router.post("/", requireAuth, upload.array("photos", 6), async (req, res, next) 
       id,
       title: title.trim(),
       place: place.trim(),
+      // dd/mm — js/script.js sorts every memory (this one plus the ones
+      // already written into index.html) by this date and places it in the
+      // right spot on the timeline, recomputing left/right automatically.
       date: date.trim(),
-      ...(side ? { side } : {}),
       photos,
       addedBy: req.session.user,
       createdAt: new Date().toISOString(),

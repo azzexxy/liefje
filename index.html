@@ -69,10 +69,13 @@
 <!--
   Each event is one .timeline-item. To add the next event, copy a whole
   block below (including its closing </div>) and:
-    - alternate the side-left / side-right class from the previous one
+    - set data-date on the item itself (dd/mm) — js/script.js sorts every
+      item (this one plus anything from assets/data/memories.json) by that
+      date and recomputes side-left/side-right automatically, so it slots
+      into the right spot in the timeline regardless of where you paste it
     - swap the photo src (drop new photos into assets/photos/surprise/)
     - update the place (first <span>) and date (<span class="timeline-day">,
-      European d/m format) in .timeline-date
+      European d/m format) in .timeline-date — keep it identical to data-date
     - write the title (<h3>) — optionally add a <p> after it for a short
       blurb, matching earlier events, if you want more text per event
 -->
@@ -109,7 +112,7 @@
     <div class="timeline-track"></div>
     <div class="timeline-fill"><span class="timeline-runner">💗</span></div>
 
-    <div class="timeline-item side-left">
+    <div class="timeline-item side-left" data-date="22/05">
       <div class="timeline-photo">
         <figure class="polaroid rot-1">
           <img src="assets/photos/surprise/daknam-1.jpg" alt="Avondwandeling in Daknam" onerror="this.parentElement.classList.add('img-missing')" />
@@ -122,7 +125,7 @@
       </div>
     </div>
 
-    <div class="timeline-item side-right">
+    <div class="timeline-item side-right" data-date="05/06">
       <div class="timeline-photo">
         <figure class="polaroid rot-2">
           <img src="assets/photos/surprise/zele-1.jpg" alt="Samen met de hond in Zele" onerror="this.parentElement.classList.add('img-missing')" />
@@ -135,7 +138,7 @@
       </div>
     </div>
 
-    <div class="timeline-item side-left">
+    <div class="timeline-item side-left" data-date="28/06">
       <div class="timeline-photo">
         <div class="timeline-photo-group">
           <figure class="polaroid rot-3">
@@ -153,7 +156,7 @@
       </div>
     </div>
 
-    <div class="timeline-item side-right">
+    <div class="timeline-item side-right" data-date="03/07">
       <div class="timeline-photo">
         <div class="timeline-photo-group">
           <figure class="polaroid rot-1">
@@ -171,7 +174,7 @@
       </div>
     </div>
 
-    <div class="timeline-item side-left">
+    <div class="timeline-item side-left" data-date="13/07">
       <div class="timeline-photo">
         <div class="timeline-photo-group">
           <figure class="polaroid rot-2">
@@ -189,7 +192,7 @@
       </div>
     </div>
 
-    <div class="timeline-item side-right">
+    <div class="timeline-item side-right" data-date="14/07">
       <div class="timeline-photo">
         <figure class="polaroid rot-1">
           <img src="assets/photos/surprise/sopela-1.jpg" alt="Groepsfoto bij zonsondergang op Sopela Beach" onerror="this.parentElement.classList.add('img-missing')" />
@@ -202,7 +205,7 @@
       </div>
     </div>
 
-    <div class="timeline-item side-left">
+    <div class="timeline-item side-left" data-date="17/07">
       <div class="timeline-photo">
         <div class="timeline-photo-group">
           <figure class="polaroid rot-3">
@@ -226,7 +229,7 @@
       </div>
     </div>
 
-    <div class="timeline-item side-right">
+    <div class="timeline-item side-right" data-date="18/07">
       <div class="timeline-photo">
         <div class="timeline-photo-group">
           <figure class="polaroid rot-4">
@@ -244,7 +247,7 @@
       </div>
     </div>
 
-    <div class="timeline-item side-left">
+    <div class="timeline-item side-left" data-date="20/07">
       <div class="timeline-photo">
         <div class="timeline-photo-group">
           <figure class="polaroid rot-2">

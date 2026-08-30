@@ -56,8 +56,6 @@
     font-size: 1rem;
     background: var(--white);
   }
-  .side-choice { display: flex; gap: 14px; margin-top: 6px; }
-  .side-choice label { display: flex; align-items: center; gap: 6px; font-weight: 500; margin: 0; }
   button {
     width: 100%;
     margin-top: 20px;
@@ -129,12 +127,7 @@
 
       <label for="date">Datum (dd/mm)</label>
       <input type="text" id="date" name="date" required pattern="\d{1,2}/\d{1,2}" placeholder="bv. 05/08" />
-
-      <label>Kant op de tijdlijn</label>
-      <div class="side-choice">
-        <label><input type="radio" name="side" value="left" checked /> links</label>
-        <label><input type="radio" name="side" value="right" /> rechts</label>
-      </div>
+      <p class="hint">Bepaalt automatisch waar dit op de tijdlijn komt te staan.</p>
 
       <label for="photos">Foto's (max 6, max 8MB per foto)</label>
       <input type="file" id="photos" name="photos" accept="image/*" multiple required />

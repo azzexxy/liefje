@@ -325,8 +325,11 @@ if (candlesRow && blowBigBtn) {
 }
 
 // ============ Dynamically added memories (posted through the admin panel) ============
-// Reads assets/data/memories.json and appends matching .timeline-item elements
-// right before the "more to come" badge. If the file is empty/missing/unreachable
+// Reads assets/data/memories.json and weaves matching .timeline-item elements
+// into the right chronological spot among the existing (static) ones, based
+// on each item's dd/mm date — not just tacked onto the end. Left/right sides
+// are then recomputed by final position so the zigzag stays clean regardless
+// of where something got inserted. If the file is empty/missing/unreachable
 // this quietly does nothing, so the static timeline above is never affected.
 (function loadDynamicMemories() {
   const timeline = document.querySelector(".memory-lane-section .timeline");
@@ -339,10 +342,19 @@ if (candlesRow && blowBigBtn) {
     Charlotte: { name: "Charlotte", avatar: "assets/avatars/charlotte.png" },
   };
 
-  function buildTimelineItem(memory, index) {
-    const side = memory.side === "left" || memory.side === "right" ? memory.side : index % 2 === 0 ? "left" : "right";
+  // Dates are dd/mm with no year, so this sorts within a single calendar
+  // year (true for everything so far) — unparseable dates sort last instead
+  // of breaking the page.
+  function dateSortKey(dateStr) {
+    const m = /^(\d{1,2})\/(\d{1,2})$/.exec((dateStr || "").trim());
+    if (!m) return Number.MAX_SAFE_INTEGER;
+    return parseInt(m[2], 10) * 100 + parseInt(m[1], 10);
+  }
+
+  function buildTimelineItem(memory) {
     const item = document.createElement("div");
-    item.className = `timeline-item side-${side}`;
+    item.className = "timeline-item";
+    item.dataset.sortKey = String(dateSortKey(memory.date));
 
     const photoWrap = document.createElement("div");
     photoWrap.className = "timeline-photo";
@@ -404,14 +416,30 @@ if (candlesRow && blowBigBtn) {
     return item;
   }
 
+  // Tags each existing (static) item with its sort key up front, so it can
+  // be merged with anything fetched below using the exact same comparison.
+  timeline.querySelectorAll(".timeline-item").forEach((item) => {
+    item.dataset.sortKey = String(dateSortKey(item.dataset.date));
+  });
+
+  function reorderByDate() {
+    const items = Array.from(timeline.querySelectorAll(".timeline-item"));
+    items.sort((a, b) => Number(a.dataset.sortKey) - Number(b.dataset.sortKey));
+    items.forEach((item, i) => {
+      item.classList.remove("side-left", "side-right");
+      item.classList.add(i % 2 === 0 ? "side-left" : "side-right");
+      timeline.insertBefore(item, continueBadge);
+    });
+  }
+
   fetch("assets/data/memories.json", { cache: "no-store" })
     .then((res) => (res.ok ? res.json() : []))
     .then((memories) => {
       if (!Array.isArray(memories) || memories.length === 0) return;
 
-      const existingCount = timeline.querySelectorAll(".timeline-item").length;
-      const newItems = memories.map((memory, i) => buildTimelineItem(memory, existingCount + i));
+      const newItems = memories.map((memory) => buildTimelineItem(memory));
       newItems.forEach((item) => timeline.insertBefore(item, continueBadge));
+      reorderByDate();
 
       const dynamicObserver = new IntersectionObserver(
         (entries) => {
