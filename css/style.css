@@ -10,6 +10,8 @@
   --pink-deep: #d6336c;
   --cream: #fffaf9;
   --text-dark: #6b3a4d;
+  --gold: #d9a441;
+  --gold-light: #f4d992;
   --shadow: 0 10px 30px rgba(214, 51, 108, 0.15);
   --font-body: "Quicksand", sans-serif;
   --font-display: "Dancing Script", cursive;
@@ -733,8 +735,32 @@ body.modal-open {
 
 /* ============ 21-candle cake ============ */
 @keyframes flicker {
-  from { transform: scale(1) rotate(-2deg); }
-  to { transform: scale(1.15) rotate(2deg); }
+  0% { transform: scale(1) rotate(-3deg) translateY(0); }
+  25% { transform: scale(1.06) rotate(2deg) translateY(-0.5px); }
+  50% { transform: scale(0.94) rotate(-2deg) translateY(0.5px); }
+  75% { transform: scale(1.1) rotate(3deg) translateY(-0.5px); }
+  100% { transform: scale(1) rotate(-3deg) translateY(0); }
+}
+
+@keyframes extinguish {
+  0% { opacity: 1; transform: scale(1) rotate(-2deg); }
+  40% { opacity: 0.6; transform: scale(1.35) rotate(8deg); }
+  100% { opacity: 0; transform: scale(0) rotate(14deg); }
+}
+
+@keyframes smokeRise {
+  0% { opacity: 0.5; transform: translate(-50%, 0) scale(0.6); }
+  100% { opacity: 0; transform: translate(-50%, -16px) scale(1.6); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(15deg); }
 }
 
 .cake-reveal-section {
@@ -742,12 +768,48 @@ body.modal-open {
 }
 
 .big-cake-wrap {
+  position: relative;
   display: flex;
   justify-content: center;
   margin: 10px 0 30px;
 }
 
+.big-cake-wrap::before {
+  content: "";
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  width: 260px;
+  height: 260px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 205, 130, 0.35), rgba(255, 205, 130, 0) 70%);
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: 0;
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+.cake-reveal-section.candles-out .big-cake-wrap::before {
+  animation: none;
+  opacity: 0.25;
+}
+
+.cake-sparkle {
+  position: absolute;
+  color: var(--gold-light);
+  text-shadow: 0 0 6px rgba(244, 217, 146, 0.8);
+  animation: sparkleTwinkle 2.4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sparkle-1 { top: 4%; left: 16%; font-size: 16px; animation-delay: 0s; }
+.sparkle-2 { top: 0%; right: 18%; font-size: 12px; animation-delay: 0.8s; }
+.sparkle-3 { bottom: 26%; right: 6%; font-size: 13px; animation-delay: 1.5s; }
+
 .big-cake {
+  position: relative;
+  z-index: 1;
   width: min(320px, 88vw);
 }
 
@@ -757,35 +819,59 @@ body.modal-open {
   justify-content: center;
   align-items: flex-end;
   gap: 3px;
-  min-height: 32px;
+  min-height: 34px;
   margin-bottom: -4px;
   padding: 0 6px;
 }
 
 .candle-mini {
   position: relative;
-  width: 5px;
-  height: 20px;
-  background: repeating-linear-gradient(45deg, var(--pink-deep), var(--pink-deep) 2px, white 2px, white 4px);
-  border-radius: 2px;
+  width: 6px;
+  height: 22px;
+  background: repeating-linear-gradient(180deg, white 0 3px, var(--pink-deep) 3px 6px);
+  border-radius: 3px 3px 1px 1px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   transition: opacity 0.4s ease;
+}
+
+.candle-mini::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: -1px;
+  right: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold-light), var(--gold), var(--gold-light));
+  border-radius: 1px;
 }
 
 .candle-mini .flame-mini {
   position: absolute;
-  top: -12px;
+  top: -13px;
   left: -1.5px;
   width: 6px;
   height: 11px;
   background: radial-gradient(circle, #ffe08a, #ff9d3d 70%);
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  animation: flicker 0.5s ease-in-out infinite alternate;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 0 6px 2px rgba(255, 179, 71, 0.55), 0 0 2px rgba(255, 255, 255, 0.8);
+  animation: flicker 0.6s ease-in-out infinite;
 }
 
 .candle-mini.blown .flame-mini {
-  opacity: 0;
-  transform: scale(0);
+  animation: extinguish 0.35s ease-out forwards;
+}
+
+.candle-mini.blown::after {
+  content: "";
+  position: absolute;
+  top: -14px;
+  left: 1.5px;
+  width: 5px;
+  height: 8px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
+  border-radius: 50%;
+  animation: smokeRise 0.9s ease-out forwards;
+  pointer-events: none;
 }
 
 .candle-mini.blown {
@@ -794,36 +880,98 @@ body.modal-open {
 
 .big-cake-body {
   position: relative;
-  height: 110px;
+  height: 140px;
 }
 
 .big-cake-layer {
   position: absolute;
-  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  height: 60px;
-  background: linear-gradient(180deg, var(--pink-300), var(--pink-400));
   border-radius: 10px;
+  box-shadow: inset 0 8px 12px rgba(255, 255, 255, 0.35), 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.big-cake-layer.layer-1 {
+  bottom: 0;
+  width: 100%;
+  height: 56px;
+  background: linear-gradient(180deg, var(--pink-300), var(--pink-400));
+}
+
+.big-cake-layer.layer-1::before,
+.big-cake-layer.layer-2::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 10px;
+  height: 6px;
+  background-image: radial-gradient(circle, white 40%, transparent 42%);
+  background-size: 10px 10px;
+  background-repeat: repeat-x;
+  opacity: 0.9;
+}
+
+.big-cake-layer.layer-1::after,
+.big-cake-layer.layer-2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold-light), var(--gold), var(--gold-light));
+  opacity: 0.85;
 }
 
 .big-cake-layer.layer-2 {
-  bottom: 48px;
-  width: 74%;
-  height: 48px;
+  bottom: 50px;
+  width: 76%;
+  height: 46px;
   background: linear-gradient(180deg, var(--pink-200), var(--pink-300));
+}
+
+.big-cake-layer.layer-3 {
+  bottom: 90px;
+  width: 52%;
+  height: 34px;
+  background: linear-gradient(180deg, var(--pink-50), var(--pink-200));
+}
+
+.big-cake-layer.layer-3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 10px;
+  background-image:
+    radial-gradient(circle at 8% 0, white 40%, transparent 42%),
+    radial-gradient(circle at 28% 0, white 45%, transparent 47%),
+    radial-gradient(circle at 50% 0, white 38%, transparent 40%),
+    radial-gradient(circle at 72% 0, white 42%, transparent 44%),
+    radial-gradient(circle at 92% 0, white 40%, transparent 42%);
 }
 
 .big-cake-top {
   position: absolute;
-  bottom: 88px;
+  bottom: 118px;
   left: 50%;
   transform: translateX(-50%);
-  width: 56%;
-  height: 18px;
+  width: 42%;
+  height: 16px;
   background: white;
   border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.cake-stand {
+  width: 104%;
+  margin: -4px auto 0;
+  height: 12px;
+  background: linear-gradient(180deg, var(--gold-light), var(--gold));
+  border-radius: 50%;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
 .wish-msg {

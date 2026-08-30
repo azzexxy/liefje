@@ -316,6 +316,7 @@ if (puzzleBoard) {
 // ============ 21 candles: the final wish before the memories unlock ============
 const candlesRow = document.getElementById("candlesRow");
 const blowBigBtn = document.getElementById("blowBigBtn");
+const cakeRevealSection = document.getElementById("cakeReveal");
 if (candlesRow && blowBigBtn) {
   let bigCakeBlown = localStorage.getItem(CANDLES_BLOWN_KEY) === "1";
 
@@ -340,6 +341,7 @@ if (candlesRow && blowBigBtn) {
   if (bigCakeBlown) {
     blowBigBtn.hidden = true;
     if (bigCakeMsg) bigCakeMsg.textContent = "Wensjes al gedaan! welkom terug bij onze herinneringen... 💗";
+    if (cakeRevealSection) cakeRevealSection.classList.add("candles-out");
     revealLockedInstant("locked-content-final");
   }
 
@@ -371,6 +373,7 @@ if (candlesRow && blowBigBtn) {
     localStorage.setItem(CANDLES_BLOWN_KEY, "1");
     blowBigBtn.disabled = true;
     if (bigCakeMsg) bigCakeMsg.textContent = "21 wensjes gedaan! welkom bij onze herinneringen... 💗";
+    if (cakeRevealSection) cakeRevealSection.classList.add("candles-out");
 
     revealLocked("locked-content-final", ".memory-lane-section", toBlow.length * 60 + 900);
   });
