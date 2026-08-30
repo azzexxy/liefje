@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>herinnering toevoegen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --pink-100: #ffe3ee;
+    --pink-200: #ffc2dd;
+    --pink-400: #ff8fbf;
+    --pink-500: #f76aa6;
+    --pink-deep: #d63c74;
+    --text-dark: #5a3b47;
+    --white: #fffaf9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Quicksand", sans-serif;
+    background: linear-gradient(160deg, var(--pink-100), var(--white) 60%);
+    color: var(--text-dark);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    border-radius: 24px;
+    border: 2px dashed var(--pink-200);
+    box-shadow: 0 10px 30px rgba(214, 60, 116, 0.12);
+    padding: 28px 24px;
+  }
+  h1 {
+    font-family: "Dancing Script", cursive;
+    color: var(--pink-deep);
+    font-size: 2rem;
+    margin: 0 0 4px;
+    text-align: center;
+  }
+  p.sub { text-align: center; margin: 0 0 22px; opacity: 0.8; font-size: 0.9rem; }
+  label { display: block; font-weight: 600; margin: 14px 0 6px; font-size: 0.9rem; }
+  input[type="text"], input[type="password"], input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1.5px solid var(--pink-200);
+    font-family: inherit;
+    font-size: 1rem;
+    background: var(--white);
+  }
+  .side-choice { display: flex; gap: 14px; margin-top: 6px; }
+  .side-choice label { display: flex; align-items: center; gap: 6px; font-weight: 500; margin: 0; }
+  button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--pink-400), var(--pink-deep));
+    color: #fff;
+    font-family: "Quicksand", sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  button.secondary {
+    background: none;
+    color: var(--pink-deep);
+    border: 1.5px solid var(--pink-200);
+    margin-top: 10px;
+  }
+  .banner {
+    margin-top: 16px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .banner.error { display: block; background: #ffe3e3; color: #a3302f; }
+  .banner.success { display: block; background: #e3f9ea; color: #226a3f; }
+  .hint { font-size: 0.8rem; opacity: 0.7; margin-top: 4px; }
+  #whoami { text-align: center; font-size: 0.85rem; margin-bottom: 14px; opacity: 0.75; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>herinnering toevoegen 💗</h1>
+    <p class="sub">enkel voor ons tweetjes</p>
+
+    <div id="whoami" hidden></div>
+    <div id="banner" class="banner"></div>
+
+    <form id="loginForm">
+      <label for="username">Gebruikersnaam</label>
+      <input type="text" id="username" name="username" autocomplete="username" required />
+      <label for="password">Wachtwoord</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required />
+      <button type="submit">Inloggen</button>
+    </form>
+
+    <form id="memoryForm" hidden>
+      <label for="title">Titel / tekst bij dit moment</label>
+      <input type="text" id="title" name="title" required maxlength="300" />
+
+      <label for="place">Plaats</label>
+      <input type="text" id="place" name="place" required maxlength="80" placeholder="bv. Gent" />
+
+      <label for="date">Datum (dd/mm)</label>
+      <input type="text" id="date" name="date" required pattern="\d{1,2}/\d{1,2}" placeholder="bv. 05/08" />
+
+      <label>Kant op de tijdlijn</label>
+      <div class="side-choice">
+        <label><input type="radio" name="side" value="left" checked /> links</label>
+        <label><input type="radio" name="side" value="right" /> rechts</label>
+      </div>
+
+      <label for="photos">Foto's (max 6, max 8MB per foto)</label>
+      <input type="file" id="photos" name="photos" accept="image/*" multiple required />
+
+      <button type="submit" id="submitBtn">Toevoegen</button>
+      <button type="button" class="secondary" id="logoutBtn">Uitloggen</button>
+    </form>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

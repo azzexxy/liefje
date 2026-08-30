@@ -30,13 +30,22 @@ throughout.
    side. To add a new event, copy a whole `.timeline-item` block (see the
    HTML comment right above the timeline for the exact steps: alternate
    `side-left`/`side-right`, drop the photo(s) in `assets/photos/surprise/`,
-   and update the place/date spans in `.timeline-date`).
+   and update the place/date spans in `.timeline-date`). Any entries in
+   `assets/data/memories.json` are appended automatically after the ones
+   above (same styling) — that's what the live "add a memory" tool below
+   writes to, so new memories don't need a manual HTML edit at all.
 5. **Scattered childhood photos** — 3 childhood photos are tucked in as
    small "POV: me when ..." stickers at different points down the page,
    each already using a real photo (`assets/photos/surprise/baby1.jpg`–
    `baby3.jpg`). Search for `.mini-throwback` to find and edit them.
 
 There's no PIN/passcode on the site — anyone with the link can open it.
+
+6. **Adding memories live** — see [`server/README.md`](server/README.md) for the
+   optional login-gated tool that lets the two of you add new memory-lane
+   entries (photos + caption) from your phones, which get committed straight
+   to this repo. It's a separate small backend, not part of the static site
+   above, and it's not linked from the site itself.
 
 ## Publish it with GitHub Pages
 

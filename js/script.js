@@ -303,3 +303,89 @@ if (candlesRow && blowBigBtn) {
     }, toBlow.length * 60 + 900);
   });
 }
+
+// ============ Dynamically added memories (posted through the admin panel) ============
+// Reads assets/data/memories.json and appends matching .timeline-item elements
+// right before the "more to come" badge. If the file is empty/missing/unreachable
+// this quietly does nothing, so the static timeline above is never affected.
+(function loadDynamicMemories() {
+  const timeline = document.querySelector(".memory-lane-section .timeline");
+  const continueBadge = document.querySelector(".timeline-continue");
+  if (!timeline || !continueBadge) return;
+
+  const ROT_CLASSES = ["rot-1", "rot-2", "rot-3", "rot-4"];
+
+  function buildTimelineItem(memory, index) {
+    const side = memory.side === "left" || memory.side === "right" ? memory.side : index % 2 === 0 ? "left" : "right";
+    const item = document.createElement("div");
+    item.className = `timeline-item side-${side}`;
+
+    const photoWrap = document.createElement("div");
+    photoWrap.className = "timeline-photo";
+    const photos = Array.isArray(memory.photos) ? memory.photos.filter(Boolean) : [];
+    const isGroup = photos.length > 1;
+    const photoContainer = isGroup ? document.createElement("div") : photoWrap;
+    if (isGroup) photoContainer.className = "timeline-photo-group";
+    photos.forEach((src, i) => {
+      const figure = document.createElement("figure");
+      figure.className = `polaroid ${ROT_CLASSES[i % ROT_CLASSES.length]}`;
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = memory.title || "Herinnering";
+      img.addEventListener("error", () => figure.classList.add("img-missing"));
+      figure.appendChild(img);
+      photoContainer.appendChild(figure);
+    });
+    if (isGroup) photoWrap.appendChild(photoContainer);
+
+    const node = document.createElement("div");
+    node.className = "timeline-node";
+
+    const text = document.createElement("div");
+    text.className = "timeline-text";
+    const dateP = document.createElement("p");
+    dateP.className = "timeline-date";
+    const placeSpan = document.createElement("span");
+    placeSpan.textContent = memory.place ? `📍 ${memory.place}` : "📍";
+    const daySpan = document.createElement("span");
+    daySpan.className = "timeline-day";
+    daySpan.textContent = memory.date || "";
+    dateP.appendChild(placeSpan);
+    dateP.appendChild(daySpan);
+    const h3 = document.createElement("h3");
+    h3.textContent = memory.title || "";
+    text.appendChild(dateP);
+    text.appendChild(h3);
+
+    item.appendChild(photoWrap);
+    item.appendChild(node);
+    item.appendChild(text);
+    return item;
+  }
+
+  fetch("assets/data/memories.json", { cache: "no-store" })
+    .then((res) => (res.ok ? res.json() : []))
+    .then((memories) => {
+      if (!Array.isArray(memories) || memories.length === 0) return;
+
+      const existingCount = timeline.querySelectorAll(".timeline-item").length;
+      const newItems = memories.map((memory, i) => buildTimelineItem(memory, existingCount + i));
+      newItems.forEach((item) => timeline.insertBefore(item, continueBadge));
+
+      const dynamicObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("in-view");
+              dynamicObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.25 }
+      );
+      newItems.forEach((item) => dynamicObserver.observe(item));
+    })
+    .catch(() => {
+      // no dynamic memories yet, or offline — the static timeline above still works fine
+    });
+})();

@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: liefje-memories-server
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DRY_RUN
+        value: "false"
+      - key: USERS
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_OWNER
+        value: azzexxy
+      - key: GITHUB_REPO
+        value: liefje
+      - key: GITHUB_BRANCH
+        value: claude/birthday-website-qr-code-79mlx6
+      - key: GITHUB_MEMORIES_PATH
+        value: assets/data/memories.json
+      - key: CLOUDINARY_URL
+        sync: false

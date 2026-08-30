@@ -1,0 +1,94 @@
+# liefje memories server
+
+A tiny login-gated backend so the two of you can add new memory-lane entries
+(photo(s) + place + date + caption) from your phones. Submitting the form:
+
+1. uploads the photo(s) to Cloudinary,
+2. appends the new entry to `assets/data/memories.json` in this repo via a
+   commit through the GitHub API.
+
+GitHub Pages then rebuilds the site automatically, and `js/script.js` on the
+public page reads `assets/data/memories.json` and renders the new entry into
+the memory-lane timeline — no manual HTML editing needed.
+
+This is deliberately **not linked from the public site**. Only the two of you
+know the URL, so nobody else can find the login page by browsing the site.
+
+## Local setup / testing
+
+```bash
+cd server
+npm install
+cp .env.example .env
+```
+
+Edit `.env`:
+- Set `DRY_RUN=true` for local testing — this skips Cloudinary and GitHub
+  entirely and just returns what *would* be saved, so you can try the whole
+  flow safely without touching the real repo or using real credentials.
+- Generate a password hash for yourself and your girlfriend:
+  ```bash
+  npm run hash-password -- "the-real-password"
+  ```
+  Put both as `USERS=jij:<hash1>,zij:<hash2>` in `.env`.
+
+Then run it:
+
+```bash
+npm start
+```
+
+Open `http://localhost:3000/admin.html`, log in, and submit a test memory.
+With `DRY_RUN=true` the success banner says "(TEST-modus: niet echt
+opgeslagen op GitHub)" and nothing is actually written anywhere.
+
+## Deploying for real (Render, free tier)
+
+1. Push this repo to GitHub (already done) and create a free account at
+   [render.com](https://render.com).
+2. **New → Web Service**, connect this repo, and it should auto-detect
+   `server/render.yaml` (or manually set root directory to `server`, build
+   command `npm install`, start command `npm start`).
+3. In the service's **Environment** tab, fill in the secret values that
+   `render.yaml` leaves blank:
+   - `USERS` — `username:bcryptHash` pairs (see "Local setup" above for how
+     to generate a hash — you can also run `npm run hash-password` locally).
+   - `GITHUB_TOKEN` — a fine-grained GitHub personal access token
+     ([github.com/settings/personal-access-tokens](https://github.com/settings/personal-access-tokens)),
+     scoped to just the `liefje` repository, with **Contents: Read and
+     write** permission and nothing else.
+   - `CLOUDINARY_URL` — from your Cloudinary dashboard (free account at
+     [cloudinary.com](https://cloudinary.com)), under Dashboard → "API
+     Environment variable". It looks like
+     `cloudinary://<api_key>:<api_secret>@<cloud_name>`.
+   - Leave `DRY_RUN=false` (already set by `render.yaml`) so it actually
+     saves for real.
+4. Deploy. Once it's live, open `https://<your-service>.onrender.com/admin.html`
+   — that's the private link only the two of you should have.
+
+Render's free tier spins the service down after inactivity, so the first
+request after a while takes a few extra seconds to wake up — that's normal.
+
+## Error handling
+
+Every failure path returns a clear Dutch-language message instead of a raw
+error or a silent hang:
+- wrong/missing login → 401
+- missing title/place/date, bad date format, no photo, non-image file → 400
+  with a specific message
+- photo over 8MB or more than 6 photos → 413
+- Cloudinary or GitHub outage/misconfiguration → 502, with the underlying
+  error logged server-side for debugging
+- a GitHub commit conflict (someone else saved a memory at the exact same
+  moment) is retried automatically with a fresh copy of the file before
+  giving up
+
+## Security notes
+
+- Only 2 users exist, defined by you via the `USERS` env var — there's no
+  public sign-up.
+- Sessions are a signed cookie (`SESSION_SECRET`); nothing is stored server-side.
+- The GitHub token should be scoped to *only* this repository with *only*
+  Contents read/write — never use a token with broader access.
+- `.env` is gitignored — never commit real secrets. Only `.env.example` (with
+  placeholder values) is tracked.
