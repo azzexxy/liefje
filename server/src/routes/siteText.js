@@ -55,4 +55,25 @@ router.patch("/:key", requireAuth, async (req, res, next) => {
   }
 });
 
+// Removes a piece of text from the page entirely (same idea as deleting a
+// memory) — stored as an explicit `null`, distinct from a key that was
+// simply never edited, so the frontend knows to hide the element instead
+// of falling back to the default text baked into the HTML.
+router.delete("/:key", requireAuth, async (req, res, next) => {
+  try {
+    const { key } = req.params;
+    if (!KEY_RE.test(key)) return res.status(400).json({ error: "Ongeldige sleutel." });
+
+    const dryRun = process.env.DRY_RUN === "true";
+    if (dryRun) return res.json({ ok: true, dryRun: true, key });
+
+    await commitSiteText((d) => {
+      d[key] = null;
+    }, `Delete site text: ${key}`);
+    res.json({ ok: true, key });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;

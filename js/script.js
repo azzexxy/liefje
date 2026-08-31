@@ -479,6 +479,7 @@ function buildTimelineItem(memory) {
       media = document.createElement("img");
       media.src = src;
       media.alt = photoAlts[i] || memory.title || "Herinnering";
+      media.addEventListener("click", () => Lightbox.open(photos, photoAlts, i));
     }
     media.addEventListener("error", () => figure.classList.add("img-missing"));
     figure.appendChild(media);
@@ -746,6 +747,119 @@ const MemoryAuth = (function setupMemoryModal() {
     getUsername: () => currentUsername,
     ready: sessionReady,
   };
+})();
+
+// ============ Photo lightbox: click a memory photo to see it bigger, scroll through the rest ============
+const Lightbox = (function setupLightbox() {
+  const overlay = document.getElementById("lightbox");
+  if (!overlay) return { open() {} };
+
+  const stage = document.getElementById("lightboxStage");
+  const counter = document.getElementById("lightboxCounter");
+  const closeBtn = document.getElementById("lightboxClose");
+  const prevBtn = document.getElementById("lightboxPrev");
+  const nextBtn = document.getElementById("lightboxNext");
+
+  let items = [];
+  let index = 0;
+
+  function render() {
+    stage.innerHTML = "";
+    const item = items[index];
+    if (!item) return;
+    let media;
+    if (item.isVideo) {
+      media = document.createElement("video");
+      media.controls = true;
+      media.loop = true;
+      media.playsInline = true;
+      media.src = item.src;
+      stage.appendChild(media);
+      // A click is a user gesture, so attempting unmuted playback here
+      // (rather than the muted autoplay used for the small inline thumbs)
+      // is allowed — if the browser still blocks it, the visible controls
+      // let her just press play herself.
+      media.play().catch(() => {});
+    } else {
+      media = document.createElement("img");
+      media.src = item.src;
+      media.alt = item.alt || "";
+      stage.appendChild(media);
+    }
+    const multiple = items.length > 1;
+    counter.textContent = multiple ? `${index + 1} / ${items.length}` : "";
+    prevBtn.hidden = !multiple;
+    nextBtn.hidden = !multiple;
+  }
+
+  function open(photos, photoAlts, startIndex) {
+    items = (photos || []).map((src, i) => ({
+      src,
+      alt: (photoAlts && photoAlts[i]) || "",
+      isVideo: isVideoUrl(src),
+    }));
+    if (!items.length) return;
+    index = ((startIndex || 0) % items.length + items.length) % items.length;
+    render();
+    overlay.hidden = false;
+    document.body.classList.add("modal-open");
+  }
+
+  function close() {
+    overlay.hidden = true;
+    document.body.classList.remove("modal-open");
+    stage.innerHTML = ""; // stops any playing video
+  }
+
+  function next() {
+    if (items.length <= 1) return;
+    index = (index + 1) % items.length;
+    render();
+  }
+
+  function prev() {
+    if (items.length <= 1) return;
+    index = (index - 1 + items.length) % items.length;
+    render();
+  }
+
+  closeBtn.addEventListener("click", close);
+  nextBtn.addEventListener("click", next);
+  prevBtn.addEventListener("click", prev);
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (overlay.hidden) return;
+    if (e.key === "Escape") close();
+    else if (e.key === "ArrowRight") next();
+    else if (e.key === "ArrowLeft") prev();
+  });
+
+  // Swipe left/right to move between photos on touch devices.
+  let touchStartX = null;
+  stage.addEventListener(
+    "touchstart",
+    (e) => {
+      touchStartX = e.touches[0].clientX;
+    },
+    { passive: true }
+  );
+  stage.addEventListener(
+    "touchend",
+    (e) => {
+      if (touchStartX === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 40) {
+        if (dx < 0) next();
+        else prev();
+      }
+      touchStartX = null;
+    },
+    { passive: true }
+  );
+
+  return { open };
 })();
 
 // ============ Editing/deleting an existing event (✏️ / 🗑️ on hover) ============
@@ -1039,12 +1153,14 @@ const MemoryEditor = (function setupMemoryEditor() {
   }
 
   // Re-renders as HTML (not just textContent) so a saved multi-line edit
-  // shows as actual line breaks, then re-attaches the pencil button that
-  // setting innerHTML would otherwise wipe out along with the old text.
+  // shows as actual line breaks, then re-attaches the pencil/bin buttons
+  // that setting innerHTML would otherwise wipe out along with the old text.
   function renderElement(el, text) {
-    const btn = el.querySelector(".text-edit-btn");
+    const editBtn = el.querySelector(".text-edit-btn");
+    const deleteBtn = el.querySelector(".text-delete-btn");
     el.innerHTML = text.split("\n").map(escapeHtml).join("<br>");
-    if (btn) el.appendChild(btn);
+    if (editBtn) el.appendChild(editBtn);
+    if (deleteBtn) el.appendChild(deleteBtn);
   }
 
   const backdrop = document.getElementById("editTextBackdrop");
@@ -1121,19 +1237,45 @@ const MemoryEditor = (function setupMemoryEditor() {
     }
   });
 
+  async function deleteText(key, el) {
+    if (!confirm("Deze tekst verwijderen? Dit kan niet ongedaan gemaakt worden.")) return;
+    try {
+      const data = await backendApi(`/api/site-text/${encodeURIComponent(key)}`, { method: "DELETE" });
+      if (!data.dryRun) el.hidden = true;
+    } catch (err) {
+      if (/niet ingelogd/i.test(err.message)) {
+        MemoryAuth.openModal();
+      } else {
+        alert(err.message);
+      }
+    }
+  }
+
   targets.forEach((el) => {
     const key = el.dataset.editable;
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "text-edit-btn";
-    btn.title = "Tekst bewerken";
-    btn.setAttribute("aria-label", "Tekst bewerken");
-    btn.textContent = "✏️";
-    btn.addEventListener("click", (e) => {
+    const editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "text-edit-btn";
+    editBtn.title = "Tekst bewerken";
+    editBtn.setAttribute("aria-label", "Tekst bewerken");
+    editBtn.textContent = "✏️";
+    editBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       openEditor(key, el);
     });
-    el.appendChild(btn);
+    el.appendChild(editBtn);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "text-delete-btn";
+    deleteBtn.title = "Tekst verwijderen";
+    deleteBtn.setAttribute("aria-label", "Tekst verwijderen");
+    deleteBtn.textContent = "🗑️";
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteText(key, el);
+    });
+    el.appendChild(deleteBtn);
   });
 
   fetch("assets/data/site-text.json", { cache: "no-store" })
@@ -1143,6 +1285,10 @@ const MemoryEditor = (function setupMemoryEditor() {
       Object.keys(overrides).forEach((key) => {
         const el = targets.find((t) => t.dataset.editable === key);
         if (!el) return;
+        if (overrides[key] === null) {
+          el.hidden = true;
+          return;
+        }
         currentValues.set(key, overrides[key]);
         renderElement(el, overrides[key]);
       });

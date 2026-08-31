@@ -47,16 +47,19 @@ throughout.
    down to its first 3 seconds before it's saved — see `server/src/video.js`).
    Add/edit/remove events either through the ⚙️ tools on the live site (see
    below), or by editing this JSON file directly and pushing.
-5. **Scattered childhood photos** — 3 childhood photos are tucked in as
-   small "POV: me when ..." stickers at different points down the page,
+5. **Childhood photos** — 3 childhood photos sit in a row of small
+   "POV: me when ..." stickers between the candles and the memory lane,
    each already using a real photo (`assets/photos/surprise/baby1.jpg`–
-   `baby3.jpg`). Search for `.mini-throwback` to find and edit them.
+   `baby3.jpg`). Search for `.mini-throwback-row` to find and edit them.
 6. **Every other bit of text** — headings, the personal note, the mini
-   throwback captions, the footer — has a small ✏️ that appears on hover
-   (always visible on touch devices). Edits are saved to
-   `assets/data/site-text.json` (again, sparse — only ever stores what's
+   throwback captions, the footer — has a small ✏️ (edit) and 🗑️ (delete)
+   that appear on hover (always visible on touch devices). Edits are saved
+   to `assets/data/site-text.json` (sparse — only ever stores what's
    actually been changed; anything not in there just uses the text already
-   written into `index.html`).
+   written into `index.html`). Deleting a piece of text removes it from the
+   page entirely — same idea as deleting a memory — and is stored there as
+   an explicit `null`, so it stays gone rather than falling back to the
+   original wording.
 
 There's no PIN/passcode on the site — anyone with the link can open it.
 
@@ -66,6 +69,9 @@ There's no PIN/passcode on the site — anyone with the link can open it.
    "add a memory" card at the end of the timeline lets either of you fill
    in a photo, place, date and description and have it committed straight
    to this repo, landing in its correct chronological spot immediately.
+8. **Enlarging photos** — clicking any memory photo opens it full-size in a
+   lightbox; if that memory has more than one photo (or a video), prev/next
+   arrows, the arrow keys, or a swipe let you step through them one by one.
 
 ## Publish it with GitHub Pages
 

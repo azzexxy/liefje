@@ -358,6 +358,44 @@ body.modal-open {
   margin: 0;
 }
 
+/* All 3 kid-photo "POV: me when..." stickers together in one clean row,
+   between the candles and the memory lane, instead of scattered down
+   the page. Sizes shrink responsively so all 3 always fit one line. */
+.mini-throwback-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: clamp(10px, 3vw, 20px);
+  margin: 50px auto;
+  padding: 0 12px;
+}
+
+.mini-throwback-row .mini-throwback {
+  margin: 0;
+  max-width: clamp(90px, 26vw, 130px);
+}
+
+.mini-throwback-row .mini-polaroid {
+  width: clamp(72px, 24vw, 100px);
+}
+
+.mini-throwback-row .mini-polaroid img {
+  height: clamp(72px, 24vw, 100px);
+}
+
+.mini-throwback-row .mini-polaroid.img-missing::before {
+  height: clamp(72px, 24vw, 100px);
+}
+
+.mini-throwback-row .mini-throwback-caption {
+  font-size: 0.95rem;
+}
+
+.mini-throwback-row .mini-throwback-text {
+  font-size: 0.75rem;
+}
+
 /* ============ Puzzle gate ============ */
 .puzzle-section {
   text-align: center;
@@ -1439,7 +1477,8 @@ body.modal-open {
   resize: vertical;
 }
 
-.text-edit-btn {
+.text-edit-btn,
+.text-delete-btn {
   display: inline-block;
   margin-left: 8px;
   font-size: 0.65em;
@@ -1452,13 +1491,120 @@ body.modal-open {
 }
 
 [data-editable]:hover .text-edit-btn,
-.text-edit-btn:focus {
+[data-editable]:hover .text-delete-btn,
+.text-edit-btn:focus,
+.text-delete-btn:focus {
   opacity: 1;
 }
 
 @media (max-width: 700px) {
   /* No hover on touch devices — always show so they're reachable by tap. */
-  .text-edit-btn {
+  .text-edit-btn,
+  .text-delete-btn {
     opacity: 0.55;
+  }
+}
+
+/* ============ Photo lightbox ============ */
+.polaroid img {
+  cursor: zoom-in;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 8, 14, 0.92);
+  padding: 20px;
+}
+
+.lightbox-stage {
+  max-width: min(92vw, 640px);
+  max-height: 82vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: pan-y;
+}
+
+.lightbox-stage img,
+.lightbox-stage video {
+  max-width: 100%;
+  max-height: 82vh;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  object-fit: contain;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 2rem;
+  line-height: 1;
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.lightbox-close:hover {
+  opacity: 1;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 1.8rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.lightbox-prev {
+  left: 10px;
+}
+
+.lightbox-next {
+  right: 10px;
+}
+
+.lightbox-counter {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+@media (max-width: 700px) {
+  .lightbox-nav {
+    width: 38px;
+    height: 38px;
+    font-size: 1.5rem;
   }
 }

@@ -28,14 +28,6 @@
   <p class="puzzle-msg" id="puzzleMsg"></p>
 </section>
 
-<div class="mini-throwback">
-  <figure class="polaroid mini-polaroid rot-3">
-    <img src="assets/photos/surprise/baby1.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
-  </figure>
-  <p class="mini-throwback-caption" data-editable="mini1-caption">POV: me when ...</p>
-  <p class="mini-throwback-text" data-editable="mini1-text">you say I'm your man :)</p>
-</div>
-
 <!-- canvas confetti burst -->
 <canvas id="confetti-canvas"></canvas>
 
@@ -65,12 +57,28 @@
   <p class="wish-msg" id="bigCakeMsg"></p>
 </section>
 
-<div class="mini-throwback">
-  <figure class="polaroid mini-polaroid rot-2">
-    <img src="assets/photos/surprise/baby2.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
-  </figure>
-  <p class="mini-throwback-caption" data-editable="mini2-caption">POV: me when ...</p>
-  <p class="mini-throwback-text" data-editable="mini2-text">you mention "headscratchiessss" :)</p>
+<div class="mini-throwback-row">
+  <div class="mini-throwback">
+    <figure class="polaroid mini-polaroid rot-3">
+      <img src="assets/photos/surprise/baby1.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
+    </figure>
+    <p class="mini-throwback-caption" data-editable="mini1-caption">POV: me when ...</p>
+    <p class="mini-throwback-text" data-editable="mini1-text">you say I'm your man :)</p>
+  </div>
+  <div class="mini-throwback">
+    <figure class="polaroid mini-polaroid rot-2">
+      <img src="assets/photos/surprise/baby2.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
+    </figure>
+    <p class="mini-throwback-caption" data-editable="mini2-caption">POV: me when ...</p>
+    <p class="mini-throwback-text" data-editable="mini2-text">you mention "headscratchiessss" :)</p>
+  </div>
+  <div class="mini-throwback">
+    <figure class="polaroid mini-polaroid rot-1">
+      <img src="assets/photos/surprise/baby3.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
+    </figure>
+    <p class="mini-throwback-caption" data-editable="mini3-caption">POV: me when ...</p>
+    <p class="mini-throwback-text" data-editable="mini3-text">you say you love me :)</p>
+  </div>
 </div>
 
 <!-- ===================== MEMORY LANE TIMELINE ===================== -->
@@ -109,7 +117,7 @@
     <p class="note-signature" data-editable="note-signature">xxx je liefje</p>
   </div>
 
-  <p class="memory-lane-flourish">✦ ✦ ✦</p>
+  <p class="memory-lane-flourish" data-editable="memory-lane-flourish">✦ ✦ ✦</p>
   <h2 class="memory-lane-title" data-editable="memory-lane-title">Let's take a trip<br />through memory lane</h2>
   <p class="section-sub" data-editable="memory-lane-subtitle">Elk plekje hieronder is een onvergetelijk dagje samen met ons tweetjes, waar we naar gelang van tijd nog dingetjes aan kunnen toevoegen.</p>
 
@@ -154,13 +162,6 @@
 
 <!-- ===================== FOOTER ===================== -->
 <footer class="footer">
-  <div class="mini-throwback">
-    <figure class="polaroid mini-polaroid rot-1">
-      <img src="assets/photos/surprise/baby3.jpg" alt="Kinderfoto" onerror="this.parentElement.classList.add('img-missing')" />
-    </figure>
-    <p class="mini-throwback-caption" data-editable="mini3-caption">POV: me when ...</p>
-    <p class="mini-throwback-text" data-editable="mini3-text">you say you love me :)</p>
-  </div>
   <p data-editable="footer-text">gemaakt met 💗 speciaal voor jou</p>
 </footer>
 
@@ -242,6 +243,15 @@
       <button type="button" id="editTextCancel" class="btn-secondary">Annuleren</button>
     </form>
   </div>
+</div>
+
+<!-- ===================== PHOTO LIGHTBOX (click any memory photo to enlarge) ===================== -->
+<div id="lightbox" class="lightbox" hidden>
+  <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Sluiten">&times;</button>
+  <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Vorige foto">&lsaquo;</button>
+  <div class="lightbox-stage" id="lightboxStage"></div>
+  <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Volgende foto">&rsaquo;</button>
+  <p class="lightbox-counter" id="lightboxCounter"></p>
 </div>
 
 <script src="js/script.js?v=2"></script>
