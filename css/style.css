@@ -877,7 +877,15 @@ body.modal-open {
   color: var(--gold);
   animation: topperShine 2.8s ease-in-out infinite;
   z-index: 2;
-  pointer-events: none;
+}
+
+/* The gradient-text-clip trick on .cake-topper makes plain text invisible
+   (transparent fill showing the background through it) — reset that for
+   the pencil/bin icons appended inside it so they stay visible. */
+.cake-topper .text-edit-btn,
+.cake-topper .text-delete-btn {
+  -webkit-text-fill-color: initial;
+  background: none;
 }
 
 .candles-row {
@@ -1092,6 +1100,20 @@ body.modal-open {
   font-size: 1.5rem;
   color: var(--pink-deep);
   min-height: 1.5em;
+}
+
+/* The button's label lives in a <span> so it stays editable, but the
+   pencil/bin themselves can't nest inside a <button> (invalid HTML,
+   breaks click handling) — they render in this sibling span instead,
+   revealed together via .cake-blow-row:hover below. */
+.cake-blow-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.editable-controls-host:empty {
+  display: none;
 }
 
 /* ============ Footer ============ */
@@ -1492,6 +1514,8 @@ body.modal-open {
 
 [data-editable]:hover .text-edit-btn,
 [data-editable]:hover .text-delete-btn,
+.cake-blow-row:hover .text-edit-btn,
+.cake-blow-row:hover .text-delete-btn,
 .text-edit-btn:focus,
 .text-delete-btn:focus {
   opacity: 1;

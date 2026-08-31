@@ -41,7 +41,7 @@
     <span class="cake-sparkle sparkle-3" aria-hidden="true">✦</span>
     <div class="big-cake">
       <div class="candles-row" id="candlesRow">
-        <span class="cake-topper" aria-hidden="true">21</span>
+        <span class="cake-topper" data-editable="cake-topper-text">21</span>
       </div>
       <div class="big-cake-body">
         <div class="big-cake-top"></div>
@@ -53,8 +53,14 @@
       <div class="cake-stand"></div>
     </div>
   </div>
-  <button class="btn-secondary" id="blowBigBtn">Blaas de 21 kaarsjes uit 🕯️</button>
-  <p class="wish-msg" id="bigCakeMsg"></p>
+  <div class="cake-blow-row">
+    <button class="btn-secondary" id="blowBigBtn"><span id="blowBtnLabel" data-editable="cake-blow-label" data-controls-target="cakeBlowLabelControls">Blaas de 21 kaarsjes uit 🕯️</span></button>
+    <span class="editable-controls-host" id="cakeBlowLabelControls"></span>
+  </div>
+  <p class="wish-msg" id="bigCakeMsg">
+    <span id="cakeWishFresh" data-editable="cake-wish-fresh" hidden>21 wensjes gedaan! welkom bij onze herinneringen... 💗</span>
+    <span id="cakeWishRepeat" data-editable="cake-wish-repeat" hidden>Wensjes al gedaan! welkom terug bij onze herinneringen... 💗</span>
+  </p>
 </section>
 
 <div class="mini-throwback-row">

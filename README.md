@@ -52,14 +52,15 @@ throughout.
    each already using a real photo (`assets/photos/surprise/baby1.jpg`–
    `baby3.jpg`). Search for `.mini-throwback-row` to find and edit them.
 6. **Every other bit of text** — headings, the personal note, the mini
-   throwback captions, the footer — has a small ✏️ (edit) and 🗑️ (delete)
-   that appear on hover (always visible on touch devices). Edits are saved
-   to `assets/data/site-text.json` (sparse — only ever stores what's
-   actually been changed; anything not in there just uses the text already
-   written into `index.html`). Deleting a piece of text removes it from the
-   page entirely — same idea as deleting a memory — and is stored there as
-   an explicit `null`, so it stays gone rather than falling back to the
-   original wording.
+   throwback captions, the footer, the "21" cake topper, the candle-blow
+   button's label, and the two wish-completion messages — has a small ✏️
+   (edit) and 🗑️ (delete) that appear on hover (always visible on touch
+   devices). Edits are saved to `assets/data/site-text.json` (sparse —
+   only ever stores what's actually been changed; anything not in there
+   just uses the text already written into `index.html`). Deleting a piece
+   of text removes it from the page entirely — same idea as deleting a
+   memory — and is stored there as an explicit `null`, so it stays gone
+   rather than falling back to the original wording.
 
 There's no PIN/passcode on the site — anyone with the link can open it.
 

@@ -333,14 +333,22 @@ if (candlesRow && blowBigBtn) {
   // takes a few puffs to get all 21 out — the button text escalates each time
   const BLOW_MESSAGES = ["Blaas nog eens", "Blaas harder", "Bijna..."];
   const TOTAL_BLOWS = BLOW_MESSAGES.length + 1;
-  const bigCakeMsg = document.getElementById("bigCakeMsg");
+  const blowBtnLabel = document.getElementById("blowBtnLabel");
   let blowCount = 0;
+
+  // The two wish-completion lines are data-editable spans, hidden by
+  // default until relevant — showing one just un-hides it, unless she's
+  // deleted it via the 🗑️, in which case it stays gone.
+  function showWishLine(id) {
+    const el = document.getElementById(id);
+    if (el && el.dataset.deleted !== "true") el.hidden = false;
+  }
 
   // Already blown out on a previous visit — show the cake already done
   // instead of making her blow them out again.
   if (bigCakeBlown) {
     blowBigBtn.hidden = true;
-    if (bigCakeMsg) bigCakeMsg.textContent = "Wensjes al gedaan! welkom terug bij onze herinneringen... 💗";
+    showWishLine("cakeWishRepeat");
     if (cakeRevealSection) cakeRevealSection.classList.add("candles-out");
     revealLockedInstant("locked-content-final");
   }
@@ -365,14 +373,14 @@ if (candlesRow && blowBigBtn) {
     blowBigBtn.classList.add("btn-pulse");
 
     if (!isFinal) {
-      blowBigBtn.textContent = BLOW_MESSAGES[blowCount - 1];
+      if (blowBtnLabel) blowBtnLabel.textContent = BLOW_MESSAGES[blowCount - 1];
       return;
     }
 
     bigCakeBlown = true;
     localStorage.setItem(CANDLES_BLOWN_KEY, "1");
     blowBigBtn.disabled = true;
-    if (bigCakeMsg) bigCakeMsg.textContent = "21 wensjes gedaan! welkom bij onze herinneringen... 💗";
+    showWishLine("cakeWishFresh");
     if (cakeRevealSection) cakeRevealSection.classList.add("candles-out");
 
     revealLocked("locked-content-final", ".memory-lane-section", toBlow.length * 60 + 900);
@@ -1241,7 +1249,10 @@ const MemoryEditor = (function setupMemoryEditor() {
     if (!confirm("Deze tekst verwijderen? Dit kan niet ongedaan gemaakt worden.")) return;
     try {
       const data = await backendApi(`/api/site-text/${encodeURIComponent(key)}`, { method: "DELETE" });
-      if (!data.dryRun) el.hidden = true;
+      if (!data.dryRun) {
+        el.hidden = true;
+        el.dataset.deleted = "true";
+      }
     } catch (err) {
       if (/niet ingelogd/i.test(err.message)) {
         MemoryAuth.openModal();
@@ -1253,6 +1264,13 @@ const MemoryEditor = (function setupMemoryEditor() {
 
   targets.forEach((el) => {
     const key = el.dataset.editable;
+    // Buttons can't nest inside a <button> (invalid HTML, breaks click
+    // handling) — data-controls-target points those cases at a sibling
+    // element to host the pencil/bin instead of appending into el itself.
+    const controlsParent = el.dataset.controlsTarget
+      ? document.getElementById(el.dataset.controlsTarget) || el
+      : el;
+
     const editBtn = document.createElement("button");
     editBtn.type = "button";
     editBtn.className = "text-edit-btn";
@@ -1263,7 +1281,7 @@ const MemoryEditor = (function setupMemoryEditor() {
       e.stopPropagation();
       openEditor(key, el);
     });
-    el.appendChild(editBtn);
+    controlsParent.appendChild(editBtn);
 
     const deleteBtn = document.createElement("button");
     deleteBtn.type = "button";
@@ -1275,7 +1293,7 @@ const MemoryEditor = (function setupMemoryEditor() {
       e.stopPropagation();
       deleteText(key, el);
     });
-    el.appendChild(deleteBtn);
+    controlsParent.appendChild(deleteBtn);
   });
 
   fetch("assets/data/site-text.json", { cache: "no-store" })
@@ -1287,6 +1305,7 @@ const MemoryEditor = (function setupMemoryEditor() {
         if (!el) return;
         if (overrides[key] === null) {
           el.hidden = true;
+          el.dataset.deleted = "true";
           return;
         }
         currentValues.set(key, overrides[key]);
