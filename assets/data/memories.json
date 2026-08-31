@@ -30,11 +30,13 @@
     "date": "28/06",
     "photos": [
       "assets/photos/surprise/gent-1.jpg",
-      "assets/photos/surprise/gent-2.jpg"
+      "assets/photos/surprise/gent-2.jpg",
+      "https://res.cloudinary.com/pl6n2ggy/image/upload/v1788137311/liefje-memories/gent-edit-1788137309368-0.jpg"
     ],
     "photoAlts": [
       "IJsje in Gent",
-      "Openluchtbioscoop in Gent"
+      "Openluchtbioscoop in Gent",
+      null
     ]
   },
   {
