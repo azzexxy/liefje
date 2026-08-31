@@ -793,9 +793,22 @@ const MemoryEditor = (function setupMemoryEditor() {
       if (removedPhotos.has(src)) wrap.classList.add("marked-remove");
       const media = isVideoUrl(src) ? document.createElement("video") : document.createElement("img");
       if (media.tagName === "VIDEO") {
+        // Deliberately no autoplay/controls/loop — this is just a small
+        // static first-frame preview so it doesn't blow up the modal or
+        // hide the buttons below it (see .edit-memory-photo video sizing).
         media.muted = true;
-        media.loop = true;
         media.playsInline = true;
+        media.preload = "metadata";
+        // Neither preload="metadata" nor seeking currentTime reliably forces
+        // a frame to actually get decoded and painted across browsers — a
+        // brief muted play-then-pause does, and is the standard trick for a
+        // static video "poster" thumbnail with no <video controls>. Calling
+        // .play() itself makes the browser load whatever data it needs.
+        media.addEventListener("loadedmetadata", () => {
+          media.play()
+            .then(() => media.pause())
+            .catch(() => {});
+        });
       } else {
         media.alt = "";
       }
